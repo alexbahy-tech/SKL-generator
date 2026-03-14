@@ -1,0 +1,1511 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SKL Generator — SMK Negeri 1 Maluku Tengah</title>
+  <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,300;0,400;0,600;0,700;1,400&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --ink:    #0d1117;
+      --ink2:   #374151;
+      --mute:   #94a3b8;
+      --border: #e2e8f0;
+      --surf:   #f8fafc;
+      --card:   #ffffff;
+      --teal:   #0e7490;
+      --tealL:  #06b6d4;
+      --tealGlow: rgba(14,116,144,.12);
+      --gold:   #b45309;
+      --goldL:  #d97706;
+      --ok:     #059669;
+      --err:    #dc2626;
+      --rs: 6px; --rm: 12px; --rl: 18px; --rx: 26px;
+    }
+
+    body {
+      font-family: 'Space Grotesk', sans-serif;
+      background: var(--surf);
+      color: var(--ink);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ─── LOGIN ─── */
+    .login-wrap {
+      position: fixed; inset: 0; z-index: 9999;
+      display: flex; align-items: center; justify-content: center;
+      background: var(--ink);
+      transition: opacity .5s, visibility .5s;
+    }
+    .login-wrap.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+
+    .login-bg {
+      position: absolute; inset: 0;
+      background:
+        radial-gradient(ellipse 70% 50% at 15% 20%, rgba(6,182,212,.08), transparent),
+        radial-gradient(ellipse 50% 60% at 85% 80%, rgba(180,83,9,.06), transparent);
+    }
+
+    .login-card {
+      position: relative;
+      background: rgba(255,255,255,.04);
+      backdrop-filter: blur(24px);
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: var(--rx);
+      padding: 3rem 2.5rem;
+      width: 90%; max-width: 400px;
+      text-align: center;
+      animation: rise .7s cubic-bezier(.16,1,.3,1);
+    }
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(30px) scale(.97); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .login-logo {
+      width: 88px; height: 88px; object-fit: contain;
+      margin-bottom: 1.5rem;
+      filter: drop-shadow(0 0 16px rgba(6,182,212,.3));
+    }
+    .login-title {
+      font-family: 'Crimson Pro', serif;
+      font-size: 1.5rem; font-weight: 700;
+      color: #fff; margin-bottom: .25rem;
+    }
+    .login-sub { color: rgba(255,255,255,.45); font-size: .85rem; margin-bottom: 2rem; }
+
+    .login-field { position: relative; margin-bottom: 1.2rem; }
+    .login-ico {
+      position: absolute; left: .9rem; top: 50%; transform: translateY(-50%);
+      font-size: 1rem; color: var(--tealL);
+    }
+    .login-inp {
+      width: 100%;
+      padding: .85rem .9rem .85rem 2.6rem;
+      background: rgba(255,255,255,.06);
+      border: 1.5px solid rgba(255,255,255,.12);
+      border-radius: var(--rm);
+      color: #fff; font-family: inherit; font-size: .95rem;
+      outline: none; transition: all .25s;
+    }
+    .login-inp::placeholder { color: rgba(255,255,255,.3); }
+    .login-inp:focus {
+      border-color: var(--tealL);
+      box-shadow: 0 0 0 3px rgba(6,182,212,.15);
+      background: rgba(255,255,255,.1);
+    }
+    .login-btn {
+      width: 100%; padding: .9rem;
+      background: linear-gradient(135deg, var(--tealL), var(--teal));
+      color: #fff; font-family: inherit; font-weight: 700;
+      font-size: .95rem; border: none; border-radius: var(--rm);
+      cursor: pointer; transition: all .25s;
+    }
+    .login-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(6,182,212,.3); }
+    .login-err {
+      color: #fca5a5; font-size: .82rem; margin-top: .8rem;
+      display: none;
+    }
+    .login-err.show { display: block; animation: shake .35s; }
+    @keyframes shake {
+      0%,100% { transform: translateX(0); }
+      25% { transform: translateX(-6px); }
+      75% { transform: translateX(6px); }
+    }
+
+    /* ─── APP ─── */
+    .app { opacity: 0; transition: opacity .5s .2s; }
+    .app.visible { opacity: 1; }
+
+    /* ─── HERO ─── */
+    .hero {
+      background: var(--ink);
+      padding: 2rem 0 3rem;
+      position: relative; overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute; top: -40%; right: -15%;
+      width: 500px; height: 500px;
+      background: radial-gradient(circle, rgba(6,182,212,.1), transparent 70%);
+      border-radius: 50%;
+    }
+    .hero-inner {
+      max-width: 1100px; margin: 0 auto; padding: 0 1.5rem;
+      position: relative; z-index: 1;
+      display: flex; align-items: center; gap: 1.5rem;
+    }
+    .hero-logo {
+      width: 80px; height: 80px; object-fit: contain; flex-shrink: 0;
+      filter: drop-shadow(0 0 16px rgba(6,182,212,.25));
+    }
+    .hero h1 {
+      font-family: 'Crimson Pro', serif;
+      font-size: 1.9rem; font-weight: 700;
+      color: #fff; margin-bottom: .2rem;
+    }
+    .hero p { color: rgba(255,255,255,.5); font-size: .9rem; }
+    .hero-badge {
+      display: inline-block;
+      background: rgba(6,182,212,.15);
+      border: 1px solid rgba(6,182,212,.3);
+      color: var(--tealL);
+      padding: .2rem .75rem;
+      border-radius: 20px; font-size: .75rem; font-weight: 600;
+      margin-top: .5rem;
+    }
+
+    /* ─── MAIN WRAP ─── */
+    .wrap {
+      max-width: 1100px; margin: -1.5rem auto 0;
+      padding: 0 1.5rem 4rem;
+      position: relative; z-index: 5;
+    }
+
+    /* ─── BACK LINK ─── */
+    .back-btn {
+      display: inline-flex; align-items: center; gap: .4rem;
+      padding: .5rem 1rem;
+      background: rgba(255,255,255,.07);
+      border: 1.5px solid rgba(255,255,255,.12);
+      color: rgba(255,255,255,.5);
+      font-family: inherit; font-size: .8rem; font-weight: 600;
+      border-radius: var(--rm); text-decoration: none;
+      transition: all .2s; margin-bottom: 1.2rem;
+      backdrop-filter: blur(8px);
+    }
+    .back-btn:hover {
+      background: rgba(6,182,212,.12);
+      border-color: rgba(6,182,212,.3);
+      color: #fff; transform: translateX(-3px);
+    }
+
+    /* ─── CARD ─── */
+    .card {
+      background: var(--card);
+      border-radius: var(--rl);
+      border: 1px solid var(--border);
+      box-shadow: 0 4px 24px rgba(14,116,144,.07);
+      margin-bottom: 1.2rem;
+    }
+
+    /* ─── SELECT ─── */
+    .sel-wrap { padding: 1.5rem 1.8rem; }
+    .sel-label {
+      font-size: .72rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 1.5px;
+      color: var(--teal); margin-bottom: .6rem;
+    }
+    .sel-input {
+      width: 100%; padding: .85rem 1rem;
+      border: 2px solid var(--border);
+      border-radius: var(--rm);
+      font-family: inherit; font-size: .95rem; font-weight: 500;
+      color: var(--ink); background: var(--surf);
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%230e7490' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: right .9rem center;
+      cursor: pointer; outline: none; transition: all .2s;
+    }
+    .sel-input:focus { border-color: var(--teal); box-shadow: 0 0 0 3px var(--tealGlow); }
+
+    /* ─── STATS ROW ─── */
+    .stats-row {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: .9rem; margin-bottom: 1.2rem;
+    }
+    .stat-card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: var(--rl); padding: 1.2rem 1.4rem;
+    }
+    .stat-label {
+      font-size: .7rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 1px;
+      color: var(--mute); margin-bottom: .4rem;
+    }
+    .stat-val { font-size: 2rem; font-weight: 700; color: var(--teal); line-height: 1; }
+    .stat-sub { font-size: .8rem; color: var(--ink2); margin-top: .3rem; }
+
+    /* ─── TABLE HEADER ─── */
+    .table-head {
+      padding: 1.1rem 1.8rem; border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: .7rem;
+    }
+    .table-title {
+      font-family: 'Crimson Pro', serif;
+      font-size: 1.15rem; font-weight: 600;
+    }
+    .table-count {
+      background: var(--surf); border: 1px solid var(--border);
+      padding: .2rem .75rem; border-radius: 20px;
+      font-size: .78rem; font-weight: 700; color: var(--teal);
+    }
+
+    /* ─── TABLE ─── */
+    .tscroll { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; }
+    thead { background: var(--ink); }
+    th {
+      padding: .85rem 1rem; color: rgba(255,255,255,.8);
+      font-size: .75rem; font-weight: 600;
+      text-transform: uppercase; letter-spacing: .7px;
+      text-align: left; white-space: nowrap;
+    }
+    th:last-child { text-align: center; }
+    tbody tr { border-bottom: 1px solid var(--border); transition: background .15s; }
+    tbody tr:hover { background: #f0f9ff; }
+    tbody tr:last-child { border-bottom: none; }
+    td { padding: .75rem 1rem; font-size: .88rem; vertical-align: middle; }
+    td:last-child { text-align: center; }
+
+    .row-no { font-weight: 700; color: var(--mute); font-size: .78rem; }
+    .row-name { font-weight: 600; }
+    .row-kelas {
+      display: inline-block;
+      padding: .2rem .6rem; border-radius: 20px;
+      font-size: .72rem; font-weight: 700;
+      background: var(--tealGlow); color: var(--teal);
+    }
+
+    /* ─── SCORE COUNT BADGE ─── */
+    .sc-badge {
+      display: inline-flex; align-items: center; gap: .25rem;
+      padding: .25rem .6rem; border-radius: 20px;
+      font-size: .72rem; font-weight: 700;
+    }
+    .sc-full { background: #d1fae5; color: #065f46; }
+    .sc-part { background: #fef3c7; color: #92400e; }
+    .sc-none { background: #fee2e2; color: #991b1b; }
+
+    /* ─── ACTION BUTTONS (per row) ─── */
+    .row-actions { display: flex; gap: .35rem; justify-content: center; flex-wrap: nowrap; }
+    .btn-prev {
+      padding: .35rem .6rem; border-radius: var(--rs);
+      background: linear-gradient(135deg, var(--tealL), var(--teal));
+      color: #fff; border: none; cursor: pointer;
+      font-size: .7rem; font-weight: 700; font-family: inherit;
+      white-space: nowrap; transition: all .2s;
+    }
+    .btn-prev:hover { transform: scale(1.04); box-shadow: 0 2px 10px rgba(6,182,212,.3); }
+    .btn-dl {
+      padding: .35rem .6rem; border-radius: var(--rs);
+      background: linear-gradient(135deg, #7c3aed, #6d28d9);
+      color: #fff; border: none; cursor: pointer;
+      font-size: .7rem; font-weight: 700; font-family: inherit;
+      white-space: nowrap; transition: all .2s;
+    }
+    .btn-dl:hover { transform: scale(1.04); box-shadow: 0 2px 10px rgba(124,58,237,.3); }
+
+    /* ─── BOTTOM ACTIONS ─── */
+    .actions-bar {
+      display: flex; justify-content: center; gap: .9rem;
+      flex-wrap: wrap; padding: 1.2rem 1.8rem;
+      border-top: 1px solid var(--border);
+    }
+    .abtn {
+      display: inline-flex; align-items: center; gap: .45rem;
+      padding: .75rem 1.75rem; border-radius: var(--rm);
+      font-family: inherit; font-weight: 700; font-size: .88rem;
+      border: none; cursor: pointer; transition: all .25s;
+    }
+    .abtn:hover { transform: translateY(-2px); }
+    .abtn-teal {
+      background: linear-gradient(135deg, var(--tealL), var(--teal));
+      color: #fff; box-shadow: 0 3px 14px rgba(6,182,212,.25);
+    }
+    .abtn-purple {
+      background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+      color: #fff; box-shadow: 0 3px 14px rgba(139,92,246,.25);
+    }
+    .abtn-gold {
+      background: linear-gradient(135deg, var(--goldL), var(--gold));
+      color: #fff; box-shadow: 0 3px 14px rgba(217,119,6,.25);
+    }
+
+    /* ─── CHECKBOX ─── */
+    .row-cb { width: 16px; height: 16px; accent-color: var(--teal); cursor: pointer; }
+    .select-all-row {
+      padding: .75rem 1.8rem; border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; gap: .5rem;
+      font-size: .82rem; font-weight: 600; color: var(--ink2);
+    }
+
+    /* ─── EMPTY ─── */
+    .empty { padding: 3.5rem 2rem; text-align: center; color: var(--mute); }
+    .empty svg { width: 56px; height: 56px; opacity: .35; margin-bottom: .8rem; }
+    .empty p { font-size: .95rem; font-weight: 500; }
+
+    /* ─── SPINNER ─── */
+    .spinner-wrap { display: none; justify-content: center; padding: 2.5rem; }
+    .spinner-wrap.show { display: flex; }
+    .spinner {
+      width: 36px; height: 36px;
+      border: 3px solid var(--border);
+      border-top-color: var(--teal);
+      border-radius: 50%;
+      animation: spin .65s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ─── PROGRESS BAR ─── */
+    .progress-wrap {
+      display: none; padding: 1.5rem 1.8rem;
+      border-top: 1px solid var(--border); text-align: center;
+    }
+    .progress-wrap.show { display: block; }
+    .progress-text { font-size: .85rem; font-weight: 600; color: var(--ink2); margin-bottom: .7rem; }
+    .progress-bar { height: 8px; background: var(--surf); border-radius: 8px; overflow: hidden; }
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--tealL), var(--teal));
+      border-radius: 8px;
+      transition: width .35s;
+    }
+
+    /* ─── TOAST ─── */
+    .toast {
+      position: fixed; top: 1.2rem; left: 50%;
+      transform: translateX(-50%) translateY(-130%);
+      background: var(--ink); color: #fff;
+      padding: .9rem 1.8rem; border-radius: var(--rm);
+      font-weight: 600; font-size: .88rem;
+      z-index: 99999; transition: transform .35s cubic-bezier(.16,1,.3,1);
+      box-shadow: 0 8px 30px rgba(0,0,0,.25);
+      white-space: nowrap; max-width: 90vw; text-align: center;
+    }
+    .toast.show { transform: translateX(-50%) translateY(0); }
+    .toast.ok  { background: linear-gradient(135deg, var(--ok), #10b981); }
+    .toast.err { background: linear-gradient(135deg, var(--err), #ef4444); }
+
+    /* ─── MODAL ─── */
+    .modal-overlay {
+      position: fixed; inset: 0; z-index: 10000;
+      background: rgba(13,17,23,.75);
+      backdrop-filter: blur(6px);
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; visibility: hidden;
+      transition: all .3s;
+    }
+    .modal-overlay.show { opacity: 1; visibility: visible; }
+    .modal {
+      background: var(--card);
+      border-radius: var(--rl);
+      width: 94%; max-width: 680px;
+      max-height: 87vh; overflow-y: auto;
+      box-shadow: 0 24px 70px rgba(0,0,0,.35);
+      animation: modalUp .4s cubic-bezier(.16,1,.3,1) both;
+      position: relative;
+    }
+    @keyframes modalUp {
+      from { opacity: 0; transform: translateY(28px) scale(.96); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    .modal-head {
+      padding: 1.2rem 1.8rem;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+      position: sticky; top: 0; background: var(--card); z-index: 2;
+      border-radius: var(--rl) var(--rl) 0 0;
+    }
+    .modal-head h3 {
+      font-family: 'Crimson Pro', serif;
+      font-size: 1.2rem; font-weight: 700;
+    }
+    .modal-close {
+      width: 32px; height: 32px;
+      border-radius: 50%; border: 1.5px solid var(--border);
+      background: var(--surf); cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.1rem; color: var(--ink2);
+      transition: all .2s;
+    }
+    .modal-close:hover { background: var(--err); color: #fff; border-color: var(--err); }
+    .modal-body { padding: 1.8rem; }
+    .modal-foot {
+      padding: .9rem 1.8rem 1.4rem;
+      border-top: 1px solid var(--border);
+      display: flex; justify-content: center; gap: .8rem; flex-wrap: wrap;
+    }
+
+    /* ─── SKL PREVIEW (inside modal) ─── */
+    .skl-doc {
+      font-family: 'Times New Roman', Times, serif;
+      font-size: 12.5px; line-height: 1.55;
+      color: #000; max-width: 580px; margin: 0 auto;
+    }
+    .skl-kop { display: flex; align-items: center; gap: 12px; margin-bottom: 4px; }
+    .skl-kop-logo { width: 60px; height: 68px; object-fit: contain; flex-shrink: 0; }
+    .skl-kop-text { flex: 1; text-align: center; }
+    .skl-kop-text h4 { font-size: 15px; font-weight: 700; margin: 1px 0; }
+    .skl-kop-text p { font-size: 10.5px; margin: 1px 0; }
+    .skl-divider { border: none; border-top: 3px double #000; margin: 7px 0 14px; }
+    .skl-title {
+      text-align: center; font-weight: 700; text-decoration: underline;
+      font-size: 13.5px; margin: 14px 0 3px;
+    }
+    .skl-nomor { text-align: center; font-size: 11.5px; margin-bottom: 14px; }
+    .skl-field { display: flex; margin: 3px 0 3px 18px; }
+    .skl-flbl { min-width: 200px; }
+    .skl-fsep { min-width: 14px; }
+    .skl-fval { flex: 1; }
+    .skl-lulus {
+      text-align: center; font-size: 17px; font-weight: 700;
+      letter-spacing: 4px; margin: 10px 0;
+    }
+    .skl-doc table {
+      width: 100%; border-collapse: collapse;
+      margin: 10px 0; font-size: 11.5px;
+    }
+    .skl-doc table th,
+    .skl-doc table td {
+      border: 1px solid #000; padding: 3px 7px;
+    }
+    .skl-doc table th { background: #f0f0f0; font-weight: 700; text-align: center; }
+    .skl-doc table td:first-child { text-align: center; width: 36px; }
+    .skl-doc table td:last-child  { text-align: center; width: 95px; }
+    .skl-sign { text-align: right; margin-top: 22px; padding-right: 18px; }
+    .skl-sign p { margin: 1px 0; }
+    .skl-sign-name { font-weight: 700; text-decoration: underline; margin-top: 56px; }
+
+    /* ─── FILTER ─── */
+    .filter-bar {
+      padding: .8rem 1.8rem;
+      border-bottom: 1px solid var(--border);
+      display: flex; gap: .5rem; flex-wrap: wrap; align-items: center;
+    }
+    .filter-inp {
+      flex: 1; min-width: 160px;
+      padding: .55rem .9rem;
+      border: 1.5px solid var(--border);
+      border-radius: var(--rm);
+      font-family: inherit; font-size: .85rem;
+      outline: none; transition: all .2s;
+    }
+    .filter-inp:focus { border-color: var(--teal); box-shadow: 0 0 0 3px var(--tealGlow); }
+
+    /* ─── FOOTER ─── */
+    footer { text-align: center; padding: 2rem; color: var(--mute); font-size: .8rem; }
+
+    @media (max-width: 768px) {
+      .hero h1 { font-size: 1.45rem; }
+      .hero-inner { gap: 1rem; }
+      .hero-logo { width: 60px; height: 60px; }
+      .stats-row { grid-template-columns: 1fr 1fr; }
+      th { font-size: .68rem; padding: .7rem .7rem; }
+      td { font-size: .8rem; padding: .65rem .7rem; }
+      .modal { width: 98%; max-height: 90vh; }
+      .skl-kop-logo { width: 46px; height: 52px; }
+      .skl-field .skl-flbl { min-width: 160px; }
+    }
+    @media (max-width: 480px) {
+      .stats-row { grid-template-columns: 1fr; }
+      .hero h1 { font-size: 1.2rem; }
+    }
+
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--teal); border-radius: 10px; }
+  </style>
+</head>
+<body>
+
+<div class="toast" id="toast"></div>
+
+<!-- MODAL PREVIEW -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <div class="modal-head">
+      <h3>📜 Preview Surat Keterangan Lulus</h3>
+      <button class="modal-close" onclick="closeModal()">&times;</button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+    <div class="modal-foot">
+      <button class="abtn abtn-purple" onclick="downloadFromModal()">📥 Download .docx</button>
+      <button class="abtn" style="background:var(--surf);color:var(--ink2);border:2px solid var(--border);" onclick="closeModal()">✖ Tutup</button>
+    </div>
+  </div>
+</div>
+
+<!-- LOGIN -->
+<div class="login-wrap" id="loginWrap">
+  <div class="login-bg"></div>
+  <div class="login-card">
+    <img src="https://iili.io/qd9rF1V.png" alt="Logo" class="login-logo">
+    <h2 class="login-title">SMK Negeri 1 Maluku Tengah</h2>
+    <p class="login-sub">Generator Surat Keterangan Lulus 2026</p>
+    <div class="login-field">
+      <span class="login-ico">🔒</span>
+      <input type="password" id="loginPw" class="login-inp" placeholder="Masukkan password..."
+        onkeydown="if(event.key==='Enter')doLogin()">
+    </div>
+    <button class="login-btn" onclick="doLogin()">Masuk</button>
+    <p class="login-err" id="loginErr">Password salah. Coba lagi.</p>
+  </div>
+</div>
+
+<!-- APP -->
+<div class="app" id="app">
+  <header class="hero">
+    <div class="hero-inner">
+      <img src="https://iili.io/qd9rF1V.png" alt="Logo" class="hero-logo">
+      <div>
+        <h1>SMK Negeri 1 Maluku Tengah</h1>
+        <p>Generator Surat Keterangan Lulus — Tahun Ajaran 2025/2026</p>
+        <span class="hero-badge">📜 SKL Generator v2</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="wrap">
+    <a href="https://alexbahy-tech.github.io/smartkurikulumsmkn1mt/" class="back-btn">
+      ← Kembali ke Dashboard
+    </a>
+
+    <!-- CLASS FILTER -->
+    <div class="card">
+      <div class="sel-wrap">
+        <div class="sel-label">Filter Program Keahlian / Kelas</div>
+        <select class="sel-input" id="kelasFilter" onchange="onFilterChange()">
+          <option value="">— Tampilkan Semua Siswa —</option>
+          <option value="XIIAKL">Akuntansi dan Keuangan Lembaga (XIIAKL)</option>
+          <option value="XIIPMS">Pemasaran (XIIPMS)</option>
+          <option value="XIIMPLB">Manajemen Perkantoran & Layanan Bisnis (XIIMPLB)</option>
+          <option value="XIITJKT">Teknik Jaringan Komputer & Telekomunikasi (XIITJKT)</option>
+          <option value="XIITK">Teknik Ketenagalistrikan (XIITK)</option>
+          <option value="XIIULP">Usaha Layanan Pariwisata (XIIULP)</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- STATS -->
+    <div class="stats-row" id="statsRow" style="display:none;">
+      <div class="stat-card">
+        <div class="stat-label">Total Siswa</div>
+        <div class="stat-val" id="statTotal">0</div>
+        <div class="stat-sub" id="statKelas">Semua kelas</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Nilai Lengkap</div>
+        <div class="stat-val" id="statLengkap" style="color:var(--ok)">0</div>
+        <div class="stat-sub">15 mata pelajaran</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Nilai Sebagian</div>
+        <div class="stat-val" id="statSebagian" style="color:var(--goldL)">0</div>
+        <div class="stat-sub">1–14 nilai terisi</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Belum Ada Nilai</div>
+        <div class="stat-val" id="statKosong" style="color:var(--err)">0</div>
+        <div class="stat-sub">0 nilai terisi</div>
+      </div>
+    </div>
+
+    <!-- TABLE -->
+    <div class="card" id="tableCard">
+      <div class="spinner-wrap show" id="spMain"><div class="spinner"></div></div>
+
+      <div id="tableContent" style="display:none;">
+        <div class="table-head">
+          <div style="display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;">
+            <span class="table-title" id="tableTitle">Daftar Siswa</span>
+            <span class="table-count" id="tableCnt">0</span>
+          </div>
+        </div>
+
+        <!-- SEARCH -->
+        <div class="filter-bar">
+          <input type="text" class="filter-inp" id="searchInp"
+            placeholder="🔍 Cari nama siswa..." oninput="filterTable()">
+          <select class="sel-input" id="nilaiFilter" style="flex:none;width:auto;padding:.55rem .9rem;font-size:.82rem;" onchange="filterTable()">
+            <option value="">Semua Status Nilai</option>
+            <option value="full">Nilai Lengkap ✅</option>
+            <option value="part">Nilai Sebagian ⏳</option>
+            <option value="none">Belum Ada Nilai ❌</option>
+          </select>
+        </div>
+
+        <!-- SELECT ALL -->
+        <div class="select-all-row">
+          <input type="checkbox" class="row-cb" id="cbAll" onchange="toggleAll(this)">
+          <label for="cbAll" style="cursor:pointer;">Pilih Semua yang Ditampilkan</label>
+        </div>
+
+        <div class="tscroll">
+          <table>
+            <thead>
+              <tr>
+                <th style="width:32px;text-align:center;"></th>
+                <th>#</th>
+                <th>Nama Siswa</th>
+                <th>Tempat / Tgl Lahir</th>
+                <th>NIS</th>
+                <th>NISN</th>
+                <th>Kelas</th>
+                <th>Nilai</th>
+                <th style="text-align:center;">Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="tbody"></tbody>
+          </table>
+        </div>
+
+        <!-- PROGRESS -->
+        <div class="progress-wrap" id="progressWrap">
+          <div class="progress-text" id="progressText">Generating SKL...</div>
+          <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+        </div>
+
+        <!-- ACTIONS -->
+        <div class="actions-bar">
+          <button class="abtn abtn-teal" onclick="generateSelected()">📦 Generate SKL Terpilih</button>
+          <button class="abtn abtn-purple" onclick="generateAll()">📥 Generate Semua SKL</button>
+          <button class="abtn abtn-gold" onclick="reloadData()">🔄 Refresh Data</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer>&copy; 2026 SMK Negeri 1 Maluku Tengah — SKL Generator</footer>
+</div>
+
+<script src="https://unpkg.com/docx@9.5.1/build/index.umd.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+<script>
+/* ═══════════════════════════════════════════════════
+   CONFIG — Sesuaikan dengan spreadsheet baru
+   ═══════════════════════════════════════════════════ */
+var PASSWORD = 'SMKBisa';
+var SHEET_ID  = '1MXCYosmDAoZvqHivvI-lAmiln9IQM5aRJ3ZxQAu8WT8';
+var SHEET_NAME = 'DATA NILAI';
+
+// Semua siswa ada di baris 2+ (baris 1 = header), dibedakan per kelas via kolom F
+
+// Kolom spreadsheet (1-based, A=1):
+// A=1 Nama  B=2 TTL  C=3 NIS  D=4 NISN  E=5 Program  F=6 Kelas  G=7 SPACER
+// H=8 Pend.Agama  I=9 Pend.Pancasila  J=10 Bhs.Indonesia  K=11 PJOK
+// L=12 Sejarah  M=13 Seni Budaya  N=14 Mulok
+// O=15 Matematika  P=16 Bhs.Inggris  Q=17 Informatika  R=18 Projek IPAS
+// S=19 DPK  T=20 KK  U=21 PKK  V=22 Mapel Pilihan
+var SUBJECTS = [
+  { k: 'pendAgama',     f: 'Pendidikan Agama dan Budi Pekerti',                g: 'A', col: 8  },
+  { k: 'pendPancasila', f: 'Pendidikan Pancasila',                             g: 'A', col: 9  },
+  { k: 'bhsIndonesia',  f: 'Bahasa Indonesia',                                 g: 'A', col: 10 },
+  { k: 'pjok',          f: 'Pendidikan Jasmani, Olahraga dan Kesehatan',       g: 'A', col: 11 },
+  { k: 'sejarah',       f: 'Sejarah',                                          g: 'A', col: 12 },
+  { k: 'seniBudaya',    f: 'Seni Budaya',                                      g: 'A', col: 13 },
+  { k: 'muatanLokal',   f: 'Muatan Lokal',                                     g: 'A', col: 14 },
+  { k: 'matematika',    f: 'Matematika',                                       g: 'B', col: 15 },
+  { k: 'bhsInggris',    f: 'Bahasa Inggris',                                   g: 'B', col: 16 },
+  { k: 'informatika',   f: 'Informatika',                                      g: 'B', col: 17 },
+  { k: 'projekIPAS',    f: 'Projek Ilmu Pengetahuan Alam dan Sosial',          g: 'B', col: 18 },
+  { k: 'dpk',           f: 'Dasar-dasar Program Keahlian',                     g: 'B', col: 19 },
+  { k: 'kk',            f: 'Konsentrasi Keahlian',                             g: 'B', col: 20 },
+  { k: 'pkk',           f: 'Projek Kreatif dan Kewirausahaan',                 g: 'B', col: 21 },
+  { k: 'mapelPilihan',  f: 'Mata Pelajaran Pilihan',                           g: 'B', col: 22 }
+];
+
+var BULAN = ['Januari','Februari','Maret','April','Mei','Juni',
+             'Juli','Agustus','September','Oktober','November','Desember'];
+
+/* ═══════════════════════════════════════════════════
+   STATE
+   ═══════════════════════════════════════════════════ */
+var allStudents   = [];   // semua siswa hasil fetch
+var filteredStudents = []; // setelah filter kelas + search
+var logoBytes = null;
+var currentPreviewIndex = -1; // index di filteredStudents
+var gvizCounter = 0;
+
+/* ═══════════════════════════════════════════════════
+   UTILS
+   ═══════════════════════════════════════════════════ */
+function $id(id) { return document.getElementById(id); }
+
+function showToast(msg, type) {
+  var el = $id('toast');
+  el.textContent = msg;
+  el.className = 'toast show' + (type === 'ok' ? ' ok' : type === 'err' ? ' err' : '');
+  setTimeout(function() { el.className = 'toast'; }, 3500);
+}
+
+function formatDate() {
+  var d = new Date();
+  return d.getDate() + ' ' + BULAN[d.getMonth()] + ' ' + d.getFullYear();
+}
+
+function escHtml(s) {
+  var d = document.createElement('div');
+  d.appendChild(document.createTextNode(String(s || '')));
+  return d.innerHTML;
+}
+
+function colToLetter(n) {
+  var s = '';
+  while (n > 0) { n--; s = String.fromCharCode(65 + (n % 26)) + s; n = Math.floor(n / 26); }
+  return s;
+}
+
+/* ═══════════════════════════════════════════════════
+   LOGIN
+   ═══════════════════════════════════════════════════ */
+function doLogin() {
+  if ($id('loginPw').value === PASSWORD) {
+    $id('loginWrap').classList.add('hidden');
+    $id('app').classList.add('visible');
+    loadData();
+  } else {
+    $id('loginErr').classList.add('show');
+    $id('loginPw').value = '';
+    setTimeout(function() { $id('loginErr').classList.remove('show'); }, 2500);
+  }
+}
+
+/* ═══════════════════════════════════════════════════
+   LOAD LOGO
+   ═══════════════════════════════════════════════════ */
+function loadLogo() {
+  var img = new Image();
+  img.crossOrigin = 'anonymous';
+  img.onload = function() {
+    var c = document.createElement('canvas');
+    c.width = img.naturalWidth; c.height = img.naturalHeight;
+    c.getContext('2d').drawImage(img, 0, 0);
+    c.toBlob(function(blob) {
+      var r = new FileReader();
+      r.onload = function() { logoBytes = new Uint8Array(r.result); };
+      r.readAsArrayBuffer(blob);
+    }, 'image/png');
+  };
+  img.src = 'https://iili.io/qdPnChb.png';
+}
+
+/* ═══════════════════════════════════════════════════
+   GVIZ FETCH — baca dari Google Sheets (no auth)
+   ═══════════════════════════════════════════════════ */
+function gvizFetch(range) {
+  return new Promise(function(resolve, reject) {
+    var cbName = '_gviz' + (++gvizCounter);
+    var script = document.createElement('script');
+    var timer = setTimeout(function() {
+      cleanup();
+      reject(new Error('Timeout mengambil data dari Google Sheets'));
+    }, 20000);
+
+    function cleanup() {
+      clearTimeout(timer);
+      delete window[cbName];
+      if (script.parentNode) script.parentNode.removeChild(script);
+    }
+
+    window[cbName] = function(resp) {
+      cleanup();
+      if (resp.status === 'error') {
+        reject(new Error('gViz Error: ' + (resp.errors && resp.errors[0] ? resp.errors[0].detailed_message : 'Unknown')));
+        return;
+      }
+      var rows = (resp.table && resp.table.rows) || [];
+      var result = rows.map(function(row) {
+        return (row.c || []).map(function(cell) {
+          if (!cell) return '';
+          if (cell.f != null) return String(cell.f);
+          if (cell.v != null) return String(cell.v);
+          return '';
+        });
+      });
+      resolve(result);
+    };
+
+    script.onerror = function() { cleanup(); reject(new Error('Gagal memuat script gViz')); };
+    script.src = 'https://docs.google.com/spreadsheets/d/' + SHEET_ID +
+      '/gviz/tq?tqx=out:json;responseHandler:' + cbName +
+      '&sheet=' + encodeURIComponent(SHEET_NAME) +
+      '&range=' + encodeURIComponent(range) +
+      '&headers=0';
+    document.head.appendChild(script);
+  });
+}
+
+/* ═══════════════════════════════════════════════════
+   ULP FALLBACK — Data siswa ULP (koreksi manual)
+   Digunakan jika gviz tidak mengembalikan baris tsb
+   ═══════════════════════════════════════════════════ */
+var ULP_STUDENTS = [
+  { nama: 'ALIYAH SUFIATY WATTIMENA',        ttl: 'Maluku Tengah, 20 Juli 2008',          nis: '1645', nisn: '0085129536', prog: 'Usaha Layanan Pariwisata', kelas: 'XIIULP' },
+  { nama: 'BRIAN SILAYA',                     ttl: 'Maluku Tengah, 23 Pebruari 2008',      nis: '1646', nisn: '0081411793', prog: 'Usaha Layanan Pariwisata', kelas: 'XIIULP' },
+  { nama: 'CHRISMEN VARLY UBYAAN',            ttl: 'Nari, 25 Desember 2007',               nis: '1647', nisn: '0078364683', prog: 'Usaha Layanan Pariwisata', kelas: 'XIIULP' },
+  { nama: 'DERLISYE E SAPULETTE',             ttl: 'Masihulan, 17 Desember 2007',          nis: '1648', nisn: '0077062767', prog: 'Usaha Layanan Pariwisata', kelas: 'XIIULP' },
+  { nama: 'DEVI CH. E. SAPULETTE',            ttl: 'Haruru, 15 Juni 2008',                 nis: '1649', nisn: '0081917501', prog: 'Usaha Layanan Pariwisata', kelas: 'XIIULP' },
+  { nama: 'DIRLI DAHAKLORY',                  ttl: 'Seram Bagian Barat, 28 Mei 2007',      nis: '1650', nisn: '0075181338', prog: 'Usaha Layanan Pariwisata', kelas: 'XIIULP' },
+  { nama: 'HAFID FAQIH ZAINU ARRIZQO',        ttl: 'Pandeglang, 06 Pebruari 2008',         nis: '1652', nisn: '0085897219', prog: 'Usaha Layanan Pariwisata', kelas: 'XIIULP' },
+  { nama: 'HEALTHY WALALAAYO',                ttl: 'Ambon, 08 April 2009',                 nis: '1653', nisn: '3093686402', prog: 'Usaha Layanan Pariwisata', kelas: 'XIIULP' },
+  { nama: 'INDRAWATI LOUHENAPESSY',           ttl: 'Maluku Tengah, 14 Januari 2008',       nis: '1654', nisn: '0081785709', prog: 'Usaha Layanan Pariwisata', kelas: 'XIIULP' },
+  { nama: 'JENNYVER TAPILATU',                ttl: 'Maluku Tengah, 21 Juli 2008',          nis: '1655', nisn: '0075960368', prog: 'Usaha Layanan Pariwisata', kelas: 'XIIULP' },
+  { nama: 'JONATHAN CHRISTO EUGARA',          ttl: 'Tangerang, 03 September 2008',         nis: '1656', nisn: '0081738233', prog: 'Usaha Layanan Pariwisata', kelas: 'XIIULP' },
+  { nama: 'LEONTIN AMARMOLLLO',               ttl: 'Maluku Tengah, 26 Januari 2008',       nis: '1657', nisn: '0086633951', prog: 'Usaha Layanan Pariwisata', kelas: 'XIIULP' },
+  { nama: 'MORENA SAPULETTE',                 ttl: 'Ambon, 15 Juni 2008',                  nis: '1658', nisn: '0089082384', prog: 'Usaha Layanan Pariwisata', kelas: 'XIIULP' },
+  { nama: 'SHEILLA SHEKINA GLORY LEKAHENA',   ttl: 'Maluku Tengah, 03 Agustus 2008',      nis: '1659', nisn: '0083490721', prog: 'Usaha Layanan Pariwisata', kelas: 'XIIULP' },
+  { nama: 'STARI SOSALE',                     ttl: 'Murnaten, 08 Pebruari 2008',           nis: '1660', nisn: '0087012594', prog: 'Usaha Layanan Pariwisata', kelas: 'XIIULP' },
+  { nama: 'THESALONIKA ILELAPOTOAA',          ttl: 'Maluku Tengah, 03 Pebruari 2008',      nis: '1661', nisn: '0083568842', prog: 'Usaha Layanan Pariwisata', kelas: 'XIIULP' },
+  { nama: 'TRIVENA DICHA KOMSARY',            ttl: 'Waipo, 30 September 2008',             nis: '1662', nisn: '0089900871', prog: 'Usaha Layanan Pariwisata', kelas: 'XIIULP' },
+  { nama: 'WILYAMS MAOLLO',                   ttl: 'Maluku Tengah, 02 Maret 2006',         nis: '1663', nisn: '0061250867', prog: 'Usaha Layanan Pariwisata', kelas: 'XIIULP' },
+  { nama: 'YUNED SAMALLO',                    ttl: 'Ambon, 24 Juli 2008',                  nis: '1665', nisn: '0084267412', prog: 'Usaha Layanan Pariwisata', kelas: 'XIIULP' }
+];
+
+function injectULPFallback() {
+  // Cek apakah siswa ULP sudah ada di allStudents (dari gviz)
+  var existingNIS = {};
+  for (var i = 0; i < allStudents.length; i++) {
+    existingNIS[allStudents[i].nis] = true;
+  }
+
+  // Tambahkan siswa ULP yang belum ada
+  var added = 0;
+  for (var j = 0; j < ULP_STUDENTS.length; j++) {
+    var u = ULP_STUDENTS[j];
+    if (!existingNIS[u.nis]) {
+      var scores = {};
+      for (var k = 0; k < SUBJECTS.length; k++) scores[SUBJECTS[k].k] = '';
+      allStudents.push({
+        nama:  u.nama,
+        ttl:   u.ttl,
+        nis:   u.nis,
+        nisn:  u.nisn,
+        prog:  u.prog,
+        kelas: u.kelas,
+        scores: scores
+      });
+      added++;
+    }
+  }
+  if (added > 0) console.log('ULP fallback: ' + added + ' siswa ditambahkan');
+}
+
+/* Update dropdown dengan kelas yang benar-benar ada di data */
+function updateKelasDropdown() {
+  var kelasSet = {};
+  for (var i = 0; i < allStudents.length; i++) {
+    var k = allStudents[i].kelas;
+    if (k) kelasSet[k] = (kelasSet[k] || 0) + 1;
+  }
+  // Update count badge di options jika diperlukan — cukup log saja
+  console.log('Kelas ditemukan:', kelasSet);
+}
+
+/* ═══════════════════════════════════════════════════
+   LOAD DATA
+   Semua data ada di baris 2–bawah, kolom A:V
+   ═══════════════════════════════════════════════════ */
+function loadData() {
+  $id('spMain').classList.add('show');
+  $id('tableContent').style.display = 'none';
+
+  // Ambil A2:V300 (mencakup semua siswa: AKL s/d ULP)
+  // Fetch dalam 2 bagian: baris 2-150 untuk jangkauan penuh
+  gvizFetch('A2:V200').then(function(rows) {
+    allStudents = [];
+    for (var i = 0; i < rows.length; i++) {
+      var r = rows[i];
+      var nama = (r[0] || '').trim();
+      if (!nama) continue;
+
+      var scores = {};
+      for (var j = 0; j < SUBJECTS.length; j++) {
+        // col dalam SUBJECTS adalah 1-based dari kolom A
+        // rows[] index = col - 1
+        // col 8 (H) = index 7, col 22 (V) = index 21
+        var cellIdx = SUBJECTS[j].col - 1;
+        scores[SUBJECTS[j].k] = (r[cellIdx] != null && String(r[cellIdx]).trim() !== '') ? String(r[cellIdx]).trim() : '';
+      }
+
+      allStudents.push({
+        nama:  nama,
+        ttl:   (r[1] || '').trim(),
+        nis:   String(r[2] || '').trim(),
+        nisn:  String(r[3] || '').trim(),
+        prog:  (r[4] || '').trim(),
+        kelas: (r[5] || '').trim(),
+        scores: scores
+      });
+    }
+
+    // Inject siswa ULP yang mungkin tidak terbaca gviz (koreksi manual)
+    injectULPFallback();
+
+    $id('spMain').classList.remove('show');
+    $id('tableContent').style.display = 'block';
+    $id('statsRow').style.display = '';
+
+    updateKelasDropdown();
+    applyFilter();
+    showToast('\u2705 Data berhasil dimuat: ' + allStudents.length + ' siswa', 'ok');
+  }).catch(function(e) {
+    $id('spMain').classList.remove('show');
+    $id('tableContent').style.display = 'block';
+    $id('tbody').innerHTML = '<tr><td colspan="9"><div class="empty"><p>⚠️ ' + escHtml(e.message) + '</p><p style="margin-top:.5rem;font-size:.8rem;">Pastikan spreadsheet dibagikan publik (Anyone with link can view)</p></div></td></tr>';
+    showToast('Gagal memuat data: ' + e.message, 'err');
+  });
+}
+
+function reloadData() {
+  allStudents = [];
+  filteredStudents = [];
+  loadData();
+}
+
+/* ═══════════════════════════════════════════════════
+   FILTER & RENDER
+   ═══════════════════════════════════════════════════ */
+function onFilterChange() { applyFilter(); }
+
+function applyFilter() {
+  var kelas = $id('kelasFilter').value;
+  var search = ($id('searchInp') ? $id('searchInp').value : '').toLowerCase().trim();
+  var nilaiF = ($id('nilaiFilter') ? $id('nilaiFilter').value : '');
+
+  filteredStudents = allStudents.filter(function(s) {
+    if (kelas && s.kelas !== kelas) return false;
+    if (search && s.nama.toLowerCase().indexOf(search) < 0) return false;
+    if (nilaiF) {
+      var cnt = countScores(s);
+      if (nilaiF === 'full' && cnt < 15) return false;
+      if (nilaiF === 'part' && (cnt === 0 || cnt >= 15)) return false;
+      if (nilaiF === 'none' && cnt > 0) return false;
+    }
+    return true;
+  });
+
+  updateStats(kelas);
+  renderTable();
+}
+
+function filterTable() { applyFilter(); }
+
+function countScores(stu) {
+  var cnt = 0;
+  for (var j = 0; j < SUBJECTS.length; j++) {
+    if (stu.scores[SUBJECTS[j].k]) cnt++;
+  }
+  return cnt;
+}
+
+function updateStats(kelas) {
+  var pool = kelas ? allStudents.filter(function(s) { return s.kelas === kelas; }) : allStudents;
+  var full = 0, part = 0, none = 0;
+  for (var i = 0; i < pool.length; i++) {
+    var c = countScores(pool[i]);
+    if (c >= 15) full++;
+    else if (c > 0) part++;
+    else none++;
+  }
+  $id('statTotal').textContent  = pool.length;
+  $id('statKelas').textContent  = kelas || 'Semua kelas';
+  $id('statLengkap').textContent = full;
+  $id('statSebagian').textContent = part;
+  $id('statKosong').textContent  = none;
+}
+
+function renderTable() {
+  var tb = $id('tbody');
+  $id('tableCnt').textContent = filteredStudents.length + ' Siswa';
+  var kelas = $id('kelasFilter').value;
+  $id('tableTitle').textContent = kelas ? 'Daftar Siswa — ' + kelas : 'Seluruh Siswa';
+
+  if (!filteredStudents.length) {
+    tb.innerHTML = '<tr><td colspan="9"><div class="empty">' +
+      '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"/></svg>' +
+      '<p>Tidak ada data siswa yang cocok</p>' +
+      '</div></td></tr>';
+    return;
+  }
+
+  var html = '';
+  for (var i = 0; i < filteredStudents.length; i++) {
+    var s = filteredStudents[i];
+    var cnt = countScores(s);
+    var badgeClass = cnt >= 15 ? 'sc-full' : cnt > 0 ? 'sc-part' : 'sc-none';
+    var badgeIcon  = cnt >= 15 ? '✅' : cnt > 0 ? '⏳' : '❌';
+
+    html += '<tr>' +
+      '<td style="text-align:center"><input type="checkbox" class="row-cb item-cb" data-idx="' + i + '"></td>' +
+      '<td><span class="row-no">' + (i + 1) + '</span></td>' +
+      '<td><span class="row-name">' + escHtml(s.nama) + '</span></td>' +
+      '<td>' + escHtml(s.ttl) + '</td>' +
+      '<td>' + escHtml(s.nis) + '</td>' +
+      '<td>' + escHtml(s.nisn) + '</td>' +
+      '<td><span class="row-kelas">' + escHtml(s.kelas) + '</span></td>' +
+      '<td><span class="sc-badge ' + badgeClass + '">' + badgeIcon + ' ' + cnt + '/15</span></td>' +
+      '<td>' +
+        '<div class="row-actions">' +
+          '<button class="btn-prev" onclick="previewSKL(' + i + ')">👁️ Preview</button>' +
+          '<button class="btn-dl" onclick="downloadSKL(' + i + ')">📄 SKL</button>' +
+        '</div>' +
+      '</td>' +
+    '</tr>';
+  }
+  tb.innerHTML = html;
+  $id('cbAll').checked = false;
+}
+
+/* ═══════════════════════════════════════════════════
+   CHECKBOX
+   ═══════════════════════════════════════════════════ */
+function toggleAll(el) {
+  var cbs = document.querySelectorAll('.item-cb');
+  for (var i = 0; i < cbs.length; i++) cbs[i].checked = el.checked;
+}
+
+/* ═══════════════════════════════════════════════════
+   PREVIEW MODAL
+   ═══════════════════════════════════════════════════ */
+function previewSKL(idx) {
+  var s = filteredStudents[idx];
+  if (!s) return showToast('Data tidak ditemukan', 'err');
+  currentPreviewIndex = idx;
+
+  var tgl = formatDate();
+  var gA = [], gB = [];
+  var tot = 0, cnt = 0;
+  for (var i = 0; i < SUBJECTS.length; i++) {
+    var sub = SUBJECTS[i];
+    var val = s.scores[sub.k] || '';
+    if (sub.g === 'A') gA.push({ name: sub.f, val: val });
+    else               gB.push({ name: sub.f, val: val });
+    var n = parseFloat(val);
+    if (!isNaN(n)) { tot += n; cnt++; }
+  }
+  var avg = cnt > 0 ? (tot / cnt).toFixed(2) : '0.00';
+
+  var h = '<div class="skl-doc">';
+  h += '<div class="skl-kop">';
+  h += '<img src="https://iili.io/qdPnChb.png" alt="Logo" class="skl-kop-logo">';
+  h += '<div class="skl-kop-text">';
+  h += '<p>PEMERINTAH PROVINSI MALUKU</p>';
+  h += '<p>DINAS PENDIDIKAN DAN KEBUDAYAAN</p>';
+  h += '<h4>SMK NEGERI 1 MALUKU TENGAH</h4>';
+  h += '<p style="font-size:10px">Jl. Sultan Hasanuddin, ☎ (0914) 21354 — Kode Pos 97515</p>';
+  h += '<p style="font-size:10px">e-mail: smkn1malukutengah@gmail.com</p>';
+  h += '</div></div>';
+  h += '<hr class="skl-divider">';
+  h += '<div class="skl-title">SURAT KETERANGAN LULUS</div>';
+  h += '<div class="skl-nomor">Nomor: 421.5/&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/2026</div>';
+  h += '<p style="text-align:justify;margin-bottom:10px;font-size:12px">Yang bertandatangan di bawah ini Kepala Sekolah Menengah Kejuruan Negeri 1 Maluku Tengah Nomor Pokok Sekolah Nasional 60100166 Kabupaten Maluku Tengah Provinsi Maluku. Dengan ini menerangkan:</p>';
+  h += field('Nama', s.nama);
+  h += field('Tempat, Tanggal Lahir', s.ttl);
+  h += field('Nomor Induk', s.nis);
+  h += field('Nomor Induk Siswa Nasional', s.nisn);
+  h += field('Program Keahlian', s.prog);
+  h += '<p style="margin:12px 0 6px;text-align:justify;font-size:12px">Berdasarkan kriteria kelulusan peserta didik yang sudah ditetapkan, maka yang bersangkutan dinyatakan:</p>';
+  h += '<div class="skl-lulus">L U L U S</div>';
+  h += '<p style="margin:6px 0;font-size:12px">Dengan hasil sebagai berikut:</p>';
+
+  h += '<table><thead><tr><th>No.</th><th>Mata Pelajaran</th><th>Nilai Ujian Sekolah</th></tr></thead><tbody>';
+  h += '<tr><td style="text-align:left;font-weight:700" colspan="3"><b>A. Kelompok Mata Pelajaran Umum</b></td></tr>';
+  for (var a = 0; a < gA.length; a++) {
+    h += '<tr><td>' + (a+1) + '</td><td style="text-align:left">' + escHtml(gA[a].name) + '</td><td>' + (gA[a].val || '—') + '</td></tr>';
+  }
+  h += '<tr><td style="text-align:left;font-weight:700" colspan="3"><b>B. Kelompok Mata Pelajaran Kejuruan</b></td></tr>';
+  for (var b = 0; b < gB.length; b++) {
+    h += '<tr><td>' + (b+1) + '</td><td style="text-align:left">' + escHtml(gB[b].name) + '</td><td>' + (gB[b].val || '—') + '</td></tr>';
+  }
+  h += '<tr><td>' + (gB.length + 1) + '</td><td style="text-align:left;font-weight:700"><b>Nilai Rata-Rata</b></td><td style="font-weight:700">' + avg + '</td></tr>';
+  h += '</tbody></table>';
+
+  h += '<p style="text-align:justify;margin:10px 0;font-size:12px">Surat Keterangan ini bersifat sementara dan berlaku sampai diterbitkannya Ijazah untuk siswa yang bersangkutan.</p>';
+  h += '<p style="text-align:justify;margin-bottom:14px;font-size:12px">Demikian Surat Keterangan ini diberikan agar dapat digunakan sebagaimana mestinya.</p>';
+  h += '<div class="skl-sign">';
+  h += '<p>Maluku Tengah, ' + tgl + '</p>';
+  h += '<p>Kepala Sekolah,</p>';
+  h += '<p class="skl-sign-name">SIANI LA JAMALUDIN, S.Pd.,M.Pd</p>';
+  h += '<p>NIP 19760515200801 1 023</p>';
+  h += '</div>';
+  h += '</div>';
+
+  $id('modalBody').innerHTML = h;
+  $id('modalOverlay').classList.add('show');
+  document.body.style.overflow = 'hidden';
+}
+
+function field(label, val) {
+  return '<div class="skl-field"><span class="skl-flbl">' + label + '</span><span class="skl-fsep">:</span><span class="skl-fval">' + escHtml(val) + '</span></div>';
+}
+
+function closeModal() {
+  $id('modalOverlay').classList.remove('show');
+  document.body.style.overflow = '';
+  currentPreviewIndex = -1;
+}
+
+function downloadFromModal() {
+  if (currentPreviewIndex < 0) return;
+  downloadSKL(currentPreviewIndex);
+}
+
+/* ═══════════════════════════════════════════════════
+   GENERATE SELECTED / ALL
+   ═══════════════════════════════════════════════════ */
+function generateSelected() {
+  var cbs = document.querySelectorAll('.item-cb:checked'), indices = [];
+  for (var i = 0; i < cbs.length; i++) indices.push(parseInt(cbs[i].getAttribute('data-idx')));
+  if (!indices.length) return showToast('Pilih minimal 1 siswa terlebih dahulu!', 'err');
+  if (indices.length === 1) { downloadSKL(indices[0]); return; }
+  batchDownload(indices);
+}
+
+function generateAll() {
+  if (!filteredStudents.length) return showToast('Tidak ada siswa untuk di-generate!', 'err');
+  var indices = [];
+  for (var i = 0; i < filteredStudents.length; i++) indices.push(i);
+  batchDownload(indices);
+}
+
+function batchDownload(indices) {
+  var total = indices.length, done = 0;
+  var pw = $id('progressWrap'), pt = $id('progressText'), pf = $id('progressFill');
+  pw.classList.add('show');
+  pt.textContent = 'Generating SKL 0/' + total + '...';
+  pf.style.width = '0%';
+
+  function next(i) {
+    if (i >= indices.length) {
+      pw.classList.remove('show');
+      showToast('✅ ' + total + ' SKL berhasil di-generate!', 'ok');
+      return;
+    }
+    var stu = filteredStudents[indices[i]];
+    buildDocx(stu).then(function(blob) {
+      saveAs(blob, 'SKL_' + stu.nama.replace(/\s+/g, '_') + '.docx');
+      done++;
+      pt.textContent = 'Generating SKL ' + done + '/' + total + '...';
+      pf.style.width = Math.round(done / total * 100) + '%';
+      setTimeout(function() { next(i + 1); }, 600);
+    }).catch(function(e) {
+      console.error('Gagal generate SKL:', stu.nama, e);
+      done++;
+      pt.textContent = 'Error: ' + stu.nama + ' — melanjutkan...';
+      pf.style.width = Math.round(done / total * 100) + '%';
+      setTimeout(function() { next(i + 1); }, 600);
+    });
+  }
+  next(0);
+}
+
+function downloadSKL(idx) {
+  var stu = filteredStudents[idx];
+  if (!stu) return showToast('Data tidak ditemukan', 'err');
+  buildDocx(stu).then(function(blob) {
+    saveAs(blob, 'SKL_' + stu.nama.replace(/\s+/g, '_') + '.docx');
+    showToast('✅ SKL ' + stu.nama + ' berhasil diunduh!', 'ok');
+  }).catch(function(e) {
+    console.error(e);
+    showToast('Gagal generate SKL: ' + e.message, 'err');
+  });
+}
+
+/* ═══════════════════════════════════════════════════
+   BUILD DOCX
+   ═══════════════════════════════════════════════════ */
+function buildDocx(stu) {
+  var D = docx;
+  var tgl = formatDate();
+
+  var gA = [], gB = [];
+  var tot = 0, cnt = 0;
+  for (var i = 0; i < SUBJECTS.length; i++) {
+    var sub = SUBJECTS[i];
+    var val = stu.scores[sub.k] || '';
+    if (sub.g === 'A') gA.push({ name: sub.f, val: val });
+    else               gB.push({ name: sub.f, val: val });
+    var n = parseFloat(val);
+    if (!isNaN(n)) { tot += n; cnt++; }
+  }
+  var avg = cnt > 0 ? (tot / cnt).toFixed(2) : '0.00';
+
+  var brd = { style: D.BorderStyle.SINGLE, size: 1, color: '000000' };
+  var bds = { top: brd, bottom: brd, left: brd, right: brd };
+  var noBdr = { style: D.BorderStyle.NONE, size: 0, color: 'FFFFFF' };
+  var noBds = { top: noBdr, bottom: noBdr, left: noBdr, right: noBdr };
+  var cm = { top: 40, bottom: 40, left: 80, right: 80 };
+
+  // Helper: table cell
+  function tc(text, opts) {
+    opts = opts || {};
+    return new D.TableCell({
+      borders: bds,
+      width: { size: opts.w || 1000, type: D.WidthType.DXA },
+      margins: cm,
+      verticalAlign: D.VerticalAlign.CENTER,
+      children: [new D.Paragraph({
+        alignment: opts.a || D.AlignmentType.LEFT,
+        spacing: { before: 20, after: 20 },
+        children: [new D.TextRun({
+          text: String(text || ''),
+          size: 20, font: 'Times New Roman', bold: !!opts.b
+        })]
+      })]
+    });
+  }
+
+  // Helper: field row (Nama : Nilai)
+  function fl(label, value) {
+    return new D.Paragraph({
+      spacing: { before: 60, after: 60, line: 276 },
+      tabStops: [
+        { type: D.TabStopType.LEFT, position: 3600 },
+        { type: D.TabStopType.LEFT, position: 3780 }
+      ],
+      children: [
+        new D.TextRun({ text: '          ' + label, size: 20, font: 'Times New Roman' }),
+        new D.TextRun({ text: '\t', size: 20 }),
+        new D.TextRun({ text: ':', size: 20, font: 'Times New Roman' }),
+        new D.TextRun({ text: '\t' + (value || ''), size: 20, font: 'Times New Roman' })
+      ]
+    });
+  }
+
+  // Helper: centered paragraph
+  function cp(text, opts) {
+    opts = opts || {};
+    return new D.Paragraph({
+      alignment: opts.a || D.AlignmentType.CENTER,
+      spacing: { before: opts.sb || 0, after: opts.sa || 0, line: 240 },
+      children: [new D.TextRun({
+        text: text, size: opts.sz || 22,
+        font: 'Times New Roman', bold: !!opts.b,
+        underline: opts.u ? { type: D.UnderlineType.SINGLE } : undefined
+      })]
+    });
+  }
+
+  // Build table rows
+  var trows = [];
+  // Header
+  trows.push(new D.TableRow({ tableHeader: true, children: [
+    tc('No.',                 { w: 700,  a: D.AlignmentType.CENTER, b: 1 }),
+    tc('Mata Pelajaran',      { w: 5600, a: D.AlignmentType.CENTER, b: 1 }),
+    tc('Nilai Ujian Sekolah', { w: 1335, a: D.AlignmentType.CENTER, b: 1 })
+  ]}));
+  // Group A
+  trows.push(new D.TableRow({ children: [
+    tc('A.', { w: 700, b: 1 }),
+    tc('Kelompok Mata Pelajaran Umum', { w: 5600, b: 1 }),
+    tc('', { w: 1335 })
+  ]}));
+  for (var a = 0; a < gA.length; a++) {
+    trows.push(new D.TableRow({ children: [
+      tc((a + 1) + '.', { w: 700,  a: D.AlignmentType.CENTER }),
+      tc(gA[a].name,    { w: 5600 }),
+      tc(gA[a].val,     { w: 1335, a: D.AlignmentType.CENTER })
+    ]}));
+  }
+  // Group B
+  trows.push(new D.TableRow({ children: [
+    tc('B.', { w: 700, b: 1 }),
+    tc('Kelompok Mata Pelajaran Kejuruan', { w: 5600, b: 1 }),
+    tc('', { w: 1335 })
+  ]}));
+  for (var b = 0; b < gB.length; b++) {
+    trows.push(new D.TableRow({ children: [
+      tc((b + 1) + '.', { w: 700,  a: D.AlignmentType.CENTER }),
+      tc(gB[b].name,    { w: 5600 }),
+      tc(gB[b].val,     { w: 1335, a: D.AlignmentType.CENTER })
+    ]}));
+  }
+  // Rata-rata
+  trows.push(new D.TableRow({ children: [
+    tc(String(gB.length + 1) + '.', { w: 700,  a: D.AlignmentType.CENTER }),
+    tc('Nilai Rata-Rata',            { w: 5600, b: 1 }),
+    tc(avg,                          { w: 1335, a: D.AlignmentType.CENTER, b: 1 })
+  ]}));
+
+  // KOP SURAT (logo + teks dalam table tanpa border)
+  var kopTexts = [
+    new D.Paragraph({ alignment: D.AlignmentType.CENTER, spacing: { before: 0, after: 0, line: 240 },
+      children: [new D.TextRun({ text: 'PEMERINTAH PROVINSI MALUKU', size: 20, font: 'Times New Roman' })] }),
+    new D.Paragraph({ alignment: D.AlignmentType.CENTER, spacing: { before: 0, after: 0, line: 240 },
+      children: [new D.TextRun({ text: 'DINAS PENDIDIKAN DAN KEBUDAYAAN', size: 20, font: 'Times New Roman' })] }),
+    new D.Paragraph({ alignment: D.AlignmentType.CENTER, spacing: { before: 0, after: 0, line: 240 },
+      children: [new D.TextRun({ text: 'SMK NEGERI 1 MALUKU TENGAH', size: 28, font: 'Times New Roman', bold: true })] }),
+    new D.Paragraph({ alignment: D.AlignmentType.CENTER, spacing: { before: 0, after: 0, line: 240 },
+      children: [new D.TextRun({ text: 'Jl. Sultan Hasanuddin, \u2706 (0914) 21354 Kode Pos 97515', size: 18, font: 'Times New Roman' })] }),
+    new D.Paragraph({ alignment: D.AlignmentType.CENTER, spacing: { before: 0, after: 0, line: 240 },
+      children: [new D.TextRun({ text: 'e-mail: smkn1malukutengah@gmail.com', size: 18, font: 'Times New Roman' })] })
+  ];
+
+  var logoCell = logoBytes
+    ? new D.TableCell({
+        borders: noBds,
+        width: { size: 1400, type: D.WidthType.DXA },
+        verticalAlign: D.VerticalAlign.CENTER,
+        margins: { top: 0, bottom: 0, left: 0, right: 80 },
+        children: [new D.Paragraph({
+          alignment: D.AlignmentType.CENTER,
+          children: [new D.ImageRun({
+            type: 'png', data: logoBytes,
+            transformation: { width: 60, height: 68 },
+            altText: { title: 'Logo', description: 'Logo SMK N1 MT', name: 'logo' }
+          })]
+        })]
+      })
+    : new D.TableCell({ borders: noBds, width: { size: 1400, type: D.WidthType.DXA },
+        children: [new D.Paragraph({ children: [] })] });
+
+  var textCell = new D.TableCell({
+    borders: noBds,
+    width: { size: 7235, type: D.WidthType.DXA },
+    verticalAlign: D.VerticalAlign.CENTER,
+    children: kopTexts
+  });
+
+  // Assemble document content
+  var ch = [];
+
+  // KOP table
+  ch.push(new D.Table({
+    width: { size: 8635, type: D.WidthType.DXA },
+    columnWidths: [1400, 7235],
+    rows: [new D.TableRow({ children: [logoCell, textCell] })],
+    borders: { top: noBdr, bottom: noBdr, left: noBdr, right: noBdr,
+               insideHorizontal: noBdr, insideVertical: noBdr }
+  }));
+
+  // Garis kop
+  ch.push(new D.Paragraph({
+    spacing: { before: 100, after: 0 },
+    border: { bottom: { style: D.BorderStyle.SINGLE, size: 6, color: '000000', space: 1 } },
+    children: []
+  }));
+
+  // Title
+  ch.push(cp('SURAT KETERANGAN LULUS', { sz: 22, b: 1, u: 1, sb: 220, sa: 0 }));
+  ch.push(cp('Nomor: 421.5/     /2026', { sz: 20, sb: 60, sa: 180 }));
+
+  // Pembukaan
+  ch.push(new D.Paragraph({
+    alignment: D.AlignmentType.JUSTIFIED,
+    spacing: { before: 100, after: 100, line: 276 },
+    children: [new D.TextRun({
+      text: 'Yang bertandatangan di bawah ini Kepala Sekolah Menengah Kejuruan Negeri 1 Maluku Tengah Nomor Pokok Sekolah Nasional 60100166 Kabupaten Maluku Tengah Provinsi Maluku. Dengan ini menerangkan:',
+      size: 20, font: 'Times New Roman'
+    })]
+  }));
+
+  // Identitas siswa
+  ch.push(fl('Nama', stu.nama));
+  ch.push(fl('Tempat, Tanggal Lahir', stu.ttl));
+  ch.push(fl('Nomor Induk', stu.nis));
+  ch.push(fl('Nomor Induk Siswa Nasional', stu.nisn));
+  ch.push(fl('Program Keahlian', stu.prog));
+
+  // Dinyatakan lulus
+  ch.push(new D.Paragraph({
+    alignment: D.AlignmentType.JUSTIFIED,
+    spacing: { before: 180, after: 60, line: 276 },
+    children: [new D.TextRun({
+      text: 'Berdasarkan kriteria kelulusan peserta didik yang sudah ditetapkan, maka yang bersangkutan dinyatakan:',
+      size: 20, font: 'Times New Roman'
+    })]
+  }));
+  ch.push(new D.Paragraph({
+    alignment: D.AlignmentType.CENTER,
+    spacing: { before: 100, after: 100 },
+    children: [new D.TextRun({ text: 'Lulus', size: 28, font: 'Times New Roman', bold: true })]
+  }));
+  ch.push(new D.Paragraph({
+    spacing: { before: 60, after: 100 },
+    children: [new D.TextRun({ text: 'Dengan hasil sebagai berikut:', size: 20, font: 'Times New Roman' })]
+  }));
+
+  // Tabel nilai
+  ch.push(new D.Table({
+    width: { size: 7635, type: D.WidthType.DXA },
+    columnWidths: [700, 5600, 1335],
+    alignment: D.AlignmentType.CENTER,
+    rows: trows
+  }));
+
+  // Penutup
+  ch.push(new D.Paragraph({
+    alignment: D.AlignmentType.JUSTIFIED,
+    spacing: { before: 180, after: 60 },
+    children: [new D.TextRun({
+      text: 'Surat Keterangan ini bersifat sementara dan berlaku sampai diterbitkannya Ijazah untuk siswa yang bersangkutan.',
+      size: 20, font: 'Times New Roman'
+    })]
+  }));
+  ch.push(new D.Paragraph({
+    alignment: D.AlignmentType.JUSTIFIED,
+    spacing: { before: 60, after: 180 },
+    children: [new D.TextRun({
+      text: 'Demikian Surat Keterangan ini diberikan agar dapat digunakan sebagaimana mestinya.',
+      size: 20, font: 'Times New Roman'
+    })]
+  }));
+
+  // Tanda tangan
+  ch.push(new D.Paragraph({
+    alignment: D.AlignmentType.RIGHT, spacing: { before: 100, after: 0 },
+    indent: { left: 5000 },
+    children: [new D.TextRun({ text: 'Maluku Tengah, ' + tgl, size: 20, font: 'Times New Roman' })]
+  }));
+  ch.push(new D.Paragraph({
+    alignment: D.AlignmentType.RIGHT, spacing: { before: 0, after: 0 },
+    indent: { left: 5000 },
+    children: [new D.TextRun({ text: 'Kepala Sekolah,', size: 20, font: 'Times New Roman' })]
+  }));
+  // Spasi tanda tangan
+  for (var s2 = 0; s2 < 4; s2++) {
+    ch.push(new D.Paragraph({ spacing: { before: 0, after: 0 }, children: [] }));
+  }
+  ch.push(new D.Paragraph({
+    alignment: D.AlignmentType.RIGHT, spacing: { before: 0, after: 0 },
+    indent: { left: 5000 },
+    children: [new D.TextRun({
+      text: 'SIANI LA JAMALUDIN, S.Pd.,M.Pd',
+      size: 20, font: 'Times New Roman', bold: true,
+      underline: { type: D.UnderlineType.SINGLE }
+    })]
+  }));
+  ch.push(new D.Paragraph({
+    alignment: D.AlignmentType.RIGHT, spacing: { before: 0 },
+    indent: { left: 5000 },
+    children: [new D.TextRun({ text: 'NIP 19760515200801 1 023', size: 20, font: 'Times New Roman' })]
+  }));
+
+  return D.Packer.toBlob(new D.Document({
+    sections: [{
+      properties: {
+        page: {
+          size: { width: 11906, height: 16838 }, // A4
+          margin: { top: 1134, right: 1134, bottom: 1134, left: 1418 }
+        }
+      },
+      children: ch
+    }]
+  }));
+}
+
+/* ═══════════════════════════════════════════════════
+   EVENT LISTENERS
+   ═══════════════════════════════════════════════════ */
+// Tutup modal klik overlay
+document.addEventListener('click', function(e) {
+  if (e.target.id === 'modalOverlay') closeModal();
+});
+// Escape key
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape' && $id('modalOverlay').classList.contains('show')) closeModal();
+});
+
+/* ═══════════════════════════════════════════════════
+   INIT
+   ═══════════════════════════════════════════════════ */
+window.addEventListener('DOMContentLoaded', function() {
+  loadLogo();
+});
+</script>
+</body>
+</html>
