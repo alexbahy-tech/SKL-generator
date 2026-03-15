@@ -1554,7 +1554,7 @@ function buildSKLHtml(stu) {
   h += '<div class="skl-lulus">L U L U S</div>';
   h += '<p style="margin:4px 0;font-size:12px">Dengan hasil sebagai berikut:</p>';
 
-  h += '<table class="skl-tbl"><thead><tr><th>No.</th><th>Mata Pelajaran</th><th>Nilai</th></tr></thead><tbody>';
+  h += '<table class="skl-tbl"><thead><tr><th>No.</th><th>Mata Pelajaran</th><th>Nilai Ujian Sekolah</th></tr></thead><tbody>';
   h += '<tr class="subgrp"><td style="text-align:left" colspan="3"><b>A. Kelompok Mata Pelajaran Umum</b></td></tr>';
   for (var a = 0; a < gA.length; a++) {
     h += '<tr><td>' + (a + 1) + '</td>' +
@@ -1568,7 +1568,7 @@ function buildSKLHtml(stu) {
          '<td>' + (gB[b].val || '—') + '</td></tr>';
   }
   h += '<tr>' +
-       '<td>' + (gB.length + 1) + '</td>' +
+       '<td></td>' +
        '<td style="text-align:left;font-weight:700"><b>Nilai Rata-Rata</b></td>' +
        '<td style="font-weight:700">' + avg + '</td>' +
        '</tr>';
@@ -1841,9 +1841,9 @@ function buildDocx(stu) {
     ]}));
   }
   trows.push(new D.TableRow({ children: [
-    tc(String(gB.length + 1) + '.', { w: 700,  a: D.AlignmentType.CENTER }),
-    tc('Nilai Rata-Rata',            { w: 7000, b: 1 }),
-    tc(avg,                          { w: 2215, a: D.AlignmentType.CENTER, b: 1 })
+    tc('',               { w: 700,  a: D.AlignmentType.CENTER }),
+    tc('Nilai Rata-Rata',{ w: 7000, b: 1 }),
+    tc(avg,              { w: 2215, a: D.AlignmentType.CENTER, b: 1 })
   ]}));
 
   /* Kop surat */
