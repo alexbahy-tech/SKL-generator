@@ -555,7 +555,7 @@
       <div>
         <h1>SMK Negeri 1 Maluku Tengah</h1>
         <p>Generator Surat Keterangan Lulus — Tahun Ajaran 2025/2026</p>
-        <span class="hero-badge">📜 SKL Generator v2</span>
+        <span class="hero-badge">📜 SKL Generator v3</span>
       </div>
     </div>
   </header>
@@ -676,53 +676,103 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
 <script>
 /* ═══════════════════════════════════════════════════
-   CONFIG — Sesuaikan dengan spreadsheet baru
+   CONFIG
+   ═══════════════════════════════════════════════════
+   Spreadsheet: https://docs.google.com/spreadsheets/d/1MXCYosmDAoZvqHivvI-lAmiln9IQM5aRJ3ZxQAu8WT8
+   Sheet: DATA NILAI
+   
+   MAPPING KOLOM AKTUAL (dikonfirmasi dari data_SKL_2026.xlsx):
+   0  A = Nama Siswa
+   1  B = Tempat, Tanggal Lahir
+   2  C = NIS
+   3  D = NISN
+   4  E = Program Keahlian
+   5  F = Kelas
+   6  G = Pend. Agama          ← MULAI NILAI (tidak ada spacer)
+   7  H = Pend. Pancasila
+   8  I = Bhs. Indonesia
+   9  J = PJOK
+   10 K = Sejarah
+   11 L = Seni Budaya
+   12 M = Mulok
+   13 N = Matematika
+   14 O = Bhs. Inggris
+   15 P = Informatika
+   16 Q = Projek IPAS
+   17 R = DPK
+   18 S = KK
+   19 T = PKK
+   20 U = Mapel Pilihan
+   21 V = Nilai Rata-Rata      ← dari sheet
+   22 W = Link SKL             ← diabaikan
+   23 X = Tanggal              ← diabaikan
    ═══════════════════════════════════════════════════ */
-var PASSWORD = 'SMKBisa';
+
+var PASSWORD  = 'SMKBisa';
 var SHEET_ID  = '1MXCYosmDAoZvqHivvI-lAmiln9IQM5aRJ3ZxQAu8WT8';
 var SHEET_NAME = 'DATA NILAI';
 
-// Semua siswa ada di baris 2+ (baris 1 = header), dibedakan per kelas via kolom F
-
-// Kolom spreadsheet (1-based, A=1):
-// A=1 Nama  B=2 TTL  C=3 NIS  D=4 NISN  E=5 Program  F=6 Kelas  G=7 SPACER
-// H=8 Pend.Agama  I=9 Pend.Pancasila  J=10 Bhs.Indonesia  K=11 PJOK
-// L=12 Sejarah  M=13 Seni Budaya  N=14 Mulok
-// O=15 Matematika  P=16 Bhs.Inggris  Q=17 Informatika  R=18 Projek IPAS
-// S=19 DPK  T=20 KK  U=21 PKK  V=22 Mapel Pilihan
+/*
+ * SUBJECTS — mapping mata pelajaran ke index kolom (0-based)
+ * Dikonfirmasi dari file Excel data_SKL_2026.xlsx:
+ *   0  = Nama Siswa          (A)
+ *   1  = Tempat, Tgl Lahir   (B)
+ *   2  = NIS                 (C)
+ *   3  = NISN                (D)
+ *   4  = Program Keahlian    (E)
+ *   5  = Kelas               (F)
+ *   6  = Pend. Agama         (G)  ← TIDAK ADA SPACER, langsung nilai
+ *   7  = Pend. Pancasila     (H)
+ *   8  = Bhs. Indonesia      (I)
+ *   9  = PJOK                (J)
+ *   10 = Sejarah             (K)
+ *   11 = Seni Budaya         (L)
+ *   12 = Mulok               (M)
+ *   13 = Matematika          (N)
+ *   14 = Bhs. Inggris        (O)
+ *   15 = Informatika         (P)
+ *   16 = Projek IPAS         (Q)
+ *   17 = DPK                 (R)
+ *   18 = KK                  (S)
+ *   19 = PKK                 (T)
+ *   20 = Mapel Pilihan       (U)
+ *   21 = Nilai Rata-Rata     (V)  ← langsung dari sheet
+ *   22 = Link SKL            (W)  ← diabaikan
+ *   23 = Tanggal             (X)  ← diabaikan
+ *
+ * CATATAN gviz: kolom G di tampilan Google Sheets terlihat sebagai spacer
+ * visual, tapi dalam data aktual (Excel/gviz) G langsung berisi Pend. Agama.
+ * gviz MENGHAPUS kolom kosong sehingga index gviz = index Excel (0-based).
+ */
 var SUBJECTS = [
-  { k: 'pendAgama',     f: 'Pendidikan Agama dan Budi Pekerti',                g: 'A', col: 8  },
-  { k: 'pendPancasila', f: 'Pendidikan Pancasila',                             g: 'A', col: 9  },
-  { k: 'bhsIndonesia',  f: 'Bahasa Indonesia',                                 g: 'A', col: 10 },
-  { k: 'pjok',          f: 'Pendidikan Jasmani, Olahraga dan Kesehatan',       g: 'A', col: 11 },
-  { k: 'sejarah',       f: 'Sejarah',                                          g: 'A', col: 12 },
-  { k: 'seniBudaya',    f: 'Seni Budaya',                                      g: 'A', col: 13 },
-  { k: 'muatanLokal',   f: 'Muatan Lokal',                                     g: 'A', col: 14 },
-  { k: 'matematika',    f: 'Matematika',                                       g: 'B', col: 15 },
-  { k: 'bhsInggris',    f: 'Bahasa Inggris',                                   g: 'B', col: 16 },
-  { k: 'informatika',   f: 'Informatika',                                      g: 'B', col: 17 },
-  { k: 'projekIPAS',    f: 'Projek Ilmu Pengetahuan Alam dan Sosial',          g: 'B', col: 18 },
-  { k: 'dpk',           f: 'Dasar-dasar Program Keahlian',                     g: 'B', col: 19 },
-  { k: 'kk',            f: 'Konsentrasi Keahlian',                             g: 'B', col: 20 },
-  { k: 'pkk',           f: 'Projek Kreatif dan Kewirausahaan',                 g: 'B', col: 21 },
-  { k: 'mapelPilihan',  f: 'Mata Pelajaran Pilihan',                           g: 'B', col: 22 }
+  { k: 'pendAgama',     f: 'Pendidikan Agama dan Budi Pekerti',                g: 'A', idx: 6  },
+  { k: 'pendPancasila', f: 'Pendidikan Pancasila',                             g: 'A', idx: 7  },
+  { k: 'bhsIndonesia',  f: 'Bahasa Indonesia',                                 g: 'A', idx: 8  },
+  { k: 'pjok',          f: 'Pendidikan Jasmani, Olahraga dan Kesehatan',       g: 'A', idx: 9  },
+  { k: 'sejarah',       f: 'Sejarah',                                          g: 'A', idx: 10 },
+  { k: 'seniBudaya',    f: 'Seni Budaya',                                      g: 'A', idx: 11 },
+  { k: 'muatanLokal',   f: 'Muatan Lokal',                                     g: 'A', idx: 12 },
+  { k: 'matematika',    f: 'Matematika',                                       g: 'B', idx: 13 },
+  { k: 'bhsInggris',    f: 'Bahasa Inggris',                                   g: 'B', idx: 14 },
+  { k: 'informatika',   f: 'Informatika',                                      g: 'B', idx: 15 },
+  { k: 'projekIPAS',    f: 'Projek Ilmu Pengetahuan Alam dan Sosial',          g: 'B', idx: 16 },
+  { k: 'dpk',           f: 'Dasar-dasar Program Keahlian',                     g: 'B', idx: 17 },
+  { k: 'kk',            f: 'Konsentrasi Keahlian',                             g: 'B', idx: 18 },
+  { k: 'pkk',           f: 'Projek Kreatif dan Kewirausahaan',                 g: 'B', idx: 19 },
+  { k: 'mapelPilihan',  f: 'Mata Pelajaran Pilihan',                           g: 'B', idx: 20 }
 ];
 
 var BULAN = ['Januari','Februari','Maret','April','Mei','Juni',
              'Juli','Agustus','September','Oktober','November','Desember'];
 
-/* ═══════════════════════════════════════════════════
-   STATE
-   ═══════════════════════════════════════════════════ */
-var allStudents   = [];   // semua siswa hasil fetch
-var filteredStudents = []; // setelah filter kelas + search
-var logoBytes = null;
-var currentPreviewIndex = -1; // index di filteredStudents
-var gvizCounter = 0;
+/* ═══════════════════════════════════════════════════ STATE ═══ */
+var allStudents      = [];
+var filteredStudents = [];
+var logoBytes        = null;
+var currentPreviewIndex = -1;
+var gvizCounter      = 0;
 
-/* ═══════════════════════════════════════════════════
-   UTILS
-   ═══════════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════ UTILS ═══ */
 function $id(id) { return document.getElementById(id); }
 
 function showToast(msg, type) {
@@ -743,15 +793,7 @@ function escHtml(s) {
   return d.innerHTML;
 }
 
-function colToLetter(n) {
-  var s = '';
-  while (n > 0) { n--; s = String.fromCharCode(65 + (n % 26)) + s; n = Math.floor(n / 26); }
-  return s;
-}
-
-/* ═══════════════════════════════════════════════════
-   LOGIN
-   ═══════════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════ LOGIN ═══ */
 function doLogin() {
   if ($id('loginPw').value === PASSWORD) {
     $id('loginWrap').classList.add('hidden');
@@ -764,9 +806,7 @@ function doLogin() {
   }
 }
 
-/* ═══════════════════════════════════════════════════
-   LOAD LOGO
-   ═══════════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════ LOGO ═══ */
 function loadLogo() {
   var img = new Image();
   img.crossOrigin = 'anonymous';
@@ -783,17 +823,15 @@ function loadLogo() {
   img.src = 'https://iili.io/qdPnChb.png';
 }
 
-/* ═══════════════════════════════════════════════════
-   GVIZ FETCH — baca dari Google Sheets (no auth)
-   ═══════════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════ GVIZ ═══ */
 function gvizFetch(range) {
   return new Promise(function(resolve, reject) {
     var cbName = '_gviz' + (++gvizCounter);
-    var script = document.createElement('script');
-    var timer = setTimeout(function() {
+    var script  = document.createElement('script');
+    var timer   = setTimeout(function() {
       cleanup();
       reject(new Error('Timeout mengambil data dari Google Sheets'));
-    }, 20000);
+    }, 25000);
 
     function cleanup() {
       clearTimeout(timer);
@@ -804,170 +842,155 @@ function gvizFetch(range) {
     window[cbName] = function(resp) {
       cleanup();
       if (resp.status === 'error') {
-        reject(new Error('gViz Error: ' + (resp.errors && resp.errors[0] ? resp.errors[0].detailed_message : 'Unknown')));
+        reject(new Error('gViz Error: ' + (resp.errors && resp.errors[0]
+          ? resp.errors[0].detailed_message : 'Unknown')));
         return;
       }
       var rows = (resp.table && resp.table.rows) || [];
       var result = rows.map(function(row) {
         return (row.c || []).map(function(cell) {
           if (!cell) return '';
-          if (cell.f != null) return String(cell.f);
-          if (cell.v != null) return String(cell.v);
+          /* formatted value (f) diutamakan agar angka tidak dikonversi */
+          if (cell.f != null && String(cell.f).trim() !== '') return String(cell.f).trim();
+          if (cell.v != null && String(cell.v).trim() !== '') return String(cell.v).trim();
           return '';
         });
       });
       resolve(result);
     };
 
-    script.onerror = function() { cleanup(); reject(new Error('Gagal memuat script gViz')); };
-    script.src = 'https://docs.google.com/spreadsheets/d/' + SHEET_ID +
+    script.onerror = function() {
+      cleanup();
+      reject(new Error('Gagal memuat script gViz'));
+    };
+
+    script.src =
+      'https://docs.google.com/spreadsheets/d/' + SHEET_ID +
       '/gviz/tq?tqx=out:json;responseHandler:' + cbName +
       '&sheet=' + encodeURIComponent(SHEET_NAME) +
       '&range=' + encodeURIComponent(range) +
       '&headers=0';
+
     document.head.appendChild(script);
   });
 }
 
 /* ═══════════════════════════════════════════════════
-   ULP FALLBACK — Data siswa ULP (koreksi manual)
-   Digunakan jika gviz tidak mengembalikan baris tsb
-   ═══════════════════════════════════════════════════ */
-var ULP_STUDENTS = [
-  { nama: 'ALIYAH SUFIATY WATTIMENA',        ttl: 'Maluku Tengah, 20 Juli 2008',          nis: '1645', nisn: '0085129536', prog: 'Usaha Layanan Pariwisata', kelas: 'XIIULP' },
-  { nama: 'BRIAN SILAYA',                     ttl: 'Maluku Tengah, 23 Pebruari 2008',      nis: '1646', nisn: '0081411793', prog: 'Usaha Layanan Pariwisata', kelas: 'XIIULP' },
-  { nama: 'CHRISMEN VARLY UBYAAN',            ttl: 'Nari, 25 Desember 2007',               nis: '1647', nisn: '0078364683', prog: 'Usaha Layanan Pariwisata', kelas: 'XIIULP' },
-  { nama: 'DERLISYE E SAPULETTE',             ttl: 'Masihulan, 17 Desember 2007',          nis: '1648', nisn: '0077062767', prog: 'Usaha Layanan Pariwisata', kelas: 'XIIULP' },
-  { nama: 'DEVI CH. E. SAPULETTE',            ttl: 'Haruru, 15 Juni 2008',                 nis: '1649', nisn: '0081917501', prog: 'Usaha Layanan Pariwisata', kelas: 'XIIULP' },
-  { nama: 'DIRLI DAHAKLORY',                  ttl: 'Seram Bagian Barat, 28 Mei 2007',      nis: '1650', nisn: '0075181338', prog: 'Usaha Layanan Pariwisata', kelas: 'XIIULP' },
-  { nama: 'HAFID FAQIH ZAINU ARRIZQO',        ttl: 'Pandeglang, 06 Pebruari 2008',         nis: '1652', nisn: '0085897219', prog: 'Usaha Layanan Pariwisata', kelas: 'XIIULP' },
-  { nama: 'HEALTHY WALALAAYO',                ttl: 'Ambon, 08 April 2009',                 nis: '1653', nisn: '3093686402', prog: 'Usaha Layanan Pariwisata', kelas: 'XIIULP' },
-  { nama: 'INDRAWATI LOUHENAPESSY',           ttl: 'Maluku Tengah, 14 Januari 2008',       nis: '1654', nisn: '0081785709', prog: 'Usaha Layanan Pariwisata', kelas: 'XIIULP' },
-  { nama: 'JENNYVER TAPILATU',                ttl: 'Maluku Tengah, 21 Juli 2008',          nis: '1655', nisn: '0075960368', prog: 'Usaha Layanan Pariwisata', kelas: 'XIIULP' },
-  { nama: 'JONATHAN CHRISTO EUGARA',          ttl: 'Tangerang, 03 September 2008',         nis: '1656', nisn: '0081738233', prog: 'Usaha Layanan Pariwisata', kelas: 'XIIULP' },
-  { nama: 'LEONTIN AMARMOLLLO',               ttl: 'Maluku Tengah, 26 Januari 2008',       nis: '1657', nisn: '0086633951', prog: 'Usaha Layanan Pariwisata', kelas: 'XIIULP' },
-  { nama: 'MORENA SAPULETTE',                 ttl: 'Ambon, 15 Juni 2008',                  nis: '1658', nisn: '0089082384', prog: 'Usaha Layanan Pariwisata', kelas: 'XIIULP' },
-  { nama: 'SHEILLA SHEKINA GLORY LEKAHENA',   ttl: 'Maluku Tengah, 03 Agustus 2008',      nis: '1659', nisn: '0083490721', prog: 'Usaha Layanan Pariwisata', kelas: 'XIIULP' },
-  { nama: 'STARI SOSALE',                     ttl: 'Murnaten, 08 Pebruari 2008',           nis: '1660', nisn: '0087012594', prog: 'Usaha Layanan Pariwisata', kelas: 'XIIULP' },
-  { nama: 'THESALONIKA ILELAPOTOAA',          ttl: 'Maluku Tengah, 03 Pebruari 2008',      nis: '1661', nisn: '0083568842', prog: 'Usaha Layanan Pariwisata', kelas: 'XIIULP' },
-  { nama: 'TRIVENA DICHA KOMSARY',            ttl: 'Waipo, 30 September 2008',             nis: '1662', nisn: '0089900871', prog: 'Usaha Layanan Pariwisata', kelas: 'XIIULP' },
-  { nama: 'WILYAMS MAOLLO',                   ttl: 'Maluku Tengah, 02 Maret 2006',         nis: '1663', nisn: '0061250867', prog: 'Usaha Layanan Pariwisata', kelas: 'XIIULP' },
-  { nama: 'YUNED SAMALLO',                    ttl: 'Ambon, 24 Juli 2008',                  nis: '1665', nisn: '0084267412', prog: 'Usaha Layanan Pariwisata', kelas: 'XIIULP' }
-];
-
-function injectULPFallback() {
-  // Cek apakah siswa ULP sudah ada di allStudents (dari gviz)
-  var existingNIS = {};
-  for (var i = 0; i < allStudents.length; i++) {
-    existingNIS[allStudents[i].nis] = true;
-  }
-
-  // Tambahkan siswa ULP yang belum ada
-  var added = 0;
-  for (var j = 0; j < ULP_STUDENTS.length; j++) {
-    var u = ULP_STUDENTS[j];
-    if (!existingNIS[u.nis]) {
-      var scores = {};
-      for (var k = 0; k < SUBJECTS.length; k++) scores[SUBJECTS[k].k] = '';
-      allStudents.push({
-        nama:  u.nama,
-        ttl:   u.ttl,
-        nis:   u.nis,
-        nisn:  u.nisn,
-        prog:  u.prog,
-        kelas: u.kelas,
-        scores: scores
-      });
-      added++;
-    }
-  }
-  if (added > 0) console.log('ULP fallback: ' + added + ' siswa ditambahkan');
-}
-
-/* Update dropdown dengan kelas yang benar-benar ada di data */
-function updateKelasDropdown() {
-  var kelasSet = {};
-  for (var i = 0; i < allStudents.length; i++) {
-    var k = allStudents[i].kelas;
-    if (k) kelasSet[k] = (kelasSet[k] || 0) + 1;
-  }
-  // Update count badge di options jika diperlukan — cukup log saja
-  console.log('Kelas ditemukan:', kelasSet);
-}
-
-/* ═══════════════════════════════════════════════════
    LOAD DATA
-   Semua data ada di baris 2–bawah, kolom A:V
+   Mengambil A2:W300 — kolom A s/d W (index 0–22)
+   Mapping ketat sesuai instruksi (tidak ada pergeseran):
+     idx 0  = Nama
+     idx 1  = TTL
+     idx 2  = NIS
+     idx 3  = NISN
+     idx 4  = Program Keahlian
+     idx 5  = Kelas
+     idx 6  = SPACER (G — dilewati)
+     idx 7  = Pend. Agama
+     idx 8  = Pend. Pancasila
+     idx 9  = Bhs. Indonesia
+     idx 10 = PJOK
+     idx 11 = Sejarah
+     idx 12 = Seni Budaya
+     idx 13 = Mulok
+     idx 14 = Matematika
+     idx 15 = Bhs. Inggris
+     idx 16 = Informatika
+     idx 17 = Projek IPAS
+     idx 18 = DPK
+     idx 19 = KK
+     idx 20 = PKK
+     idx 21 = Mapel Pilihan
+     idx 22 = Nilai Rata-Rata (dari sheet)
    ═══════════════════════════════════════════════════ */
 function loadData() {
   $id('spMain').classList.add('show');
   $id('tableContent').style.display = 'none';
 
-  // Ambil A2:V300 (mencakup semua siswa: AKL s/d ULP)
-  // Fetch dalam 2 bagian: baris 2-150 untuk jangkauan penuh
-  gvizFetch('A2:V200').then(function(rows) {
+  /* Ambil A2:V300 — kolom A s/d V (idx 0–21), V = Nilai Rata-Rata
+     Mapping dikonfirmasi dari file Excel:
+       idx 0-5  = Nama, TTL, NIS, NISN, Program, Kelas
+       idx 6    = Pend. Agama (G) — LANGSUNG, tidak ada spacer
+       idx 7-12 = Pend.Pancasila, Bhs.Indonesia, PJOK, Sejarah, Seni Budaya, Mulok
+       idx 13-20= Matematika, Bhs.Inggris, Informatika, ProjekIPAS, DPK, KK, PKK, MapelPilihan
+       idx 21   = Nilai Rata-Rata (V)
+  */
+  gvizFetch('A2:V300').then(function(rows) {
     allStudents = [];
-    for (var i = 0; i < rows.length; i++) {
-      var r = rows[i];
-      var nama = (r[0] || '').trim();
-      if (!nama) continue;
 
+    for (var i = 0; i < rows.length; i++) {
+      var r    = rows[i];
+      var nama = String(r[0] || '').trim();
+      if (!nama) continue;  /* lewati baris kosong */
+
+      /* Baca nilai setiap mata pelajaran dari index yang tepat */
       var scores = {};
       for (var j = 0; j < SUBJECTS.length; j++) {
-        // col dalam SUBJECTS adalah 1-based dari kolom A
-        // rows[] index = col - 1
-        // col 8 (H) = index 7, col 22 (V) = index 21
-        var cellIdx = SUBJECTS[j].col - 1;
-        scores[SUBJECTS[j].k] = (r[cellIdx] != null && String(r[cellIdx]).trim() !== '') ? String(r[cellIdx]).trim() : '';
+        var idx  = SUBJECTS[j].idx;          /* index langsung (0-based) */
+        var raw  = (r[idx] != null) ? String(r[idx]).trim() : '';
+        /* Abaikan nilai yang tidak masuk akal (error formula) */
+        if (raw === '#REF!' || raw === '#N/A' || raw === '#VALUE!' || raw === '#ERROR!') {
+          raw = '';
+        }
+        scores[SUBJECTS[j].k] = raw;
+      }
+
+      /* Nilai rata-rata langsung dari kolom V (idx 21) */
+      var nilaiRataRata = '';
+      if (r[21] != null) {
+        var rv = String(r[21]).trim();
+        if (rv !== '#REF!' && rv !== '#N/A' && rv !== '#VALUE!' && rv !== '#ERROR!') {
+          nilaiRataRata = rv;
+        }
       }
 
       allStudents.push({
-        nama:  nama,
-        ttl:   (r[1] || '').trim(),
-        nis:   String(r[2] || '').trim(),
-        nisn:  String(r[3] || '').trim(),
-        prog:  (r[4] || '').trim(),
-        kelas: (r[5] || '').trim(),
-        scores: scores
+        nama:          nama,
+        ttl:           String(r[1] || '').trim(),
+        nis:           String(r[2] || '').trim(),
+        nisn:          String(r[3] || '').trim(),
+        prog:          String(r[4] || '').trim(),
+        kelas:         String(r[5] || '').trim(),
+        scores:        scores,
+        nilaiRataRata: nilaiRataRata
       });
     }
 
-    // Inject siswa ULP yang mungkin tidak terbaca gviz (koreksi manual)
-    injectULPFallback();
-
     $id('spMain').classList.remove('show');
     $id('tableContent').style.display = 'block';
-    $id('statsRow').style.display = '';
+    $id('statsRow').style.display     = '';
 
-    updateKelasDropdown();
     applyFilter();
-    showToast('\u2705 Data berhasil dimuat: ' + allStudents.length + ' siswa', 'ok');
+    showToast('✅ Data berhasil dimuat: ' + allStudents.length + ' siswa', 'ok');
+    console.log('[SKL] Total siswa dimuat:', allStudents.length);
   }).catch(function(e) {
     $id('spMain').classList.remove('show');
     $id('tableContent').style.display = 'block';
-    $id('tbody').innerHTML = '<tr><td colspan="9"><div class="empty"><p>⚠️ ' + escHtml(e.message) + '</p><p style="margin-top:.5rem;font-size:.8rem;">Pastikan spreadsheet dibagikan publik (Anyone with link can view)</p></div></td></tr>';
+    $id('tbody').innerHTML =
+      '<tr><td colspan="9"><div class="empty">' +
+      '<p>⚠️ ' + escHtml(e.message) + '</p>' +
+      '<p style="margin-top:.5rem;font-size:.8rem;">Pastikan spreadsheet dibagikan publik (Anyone with link can view)</p>' +
+      '</div></td></tr>';
     showToast('Gagal memuat data: ' + e.message, 'err');
   });
 }
 
 function reloadData() {
-  allStudents = [];
+  allStudents      = [];
   filteredStudents = [];
   loadData();
 }
 
-/* ═══════════════════════════════════════════════════
-   FILTER & RENDER
-   ═══════════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════ FILTER ═══ */
 function onFilterChange() { applyFilter(); }
 
 function applyFilter() {
-  var kelas = $id('kelasFilter').value;
-  var search = ($id('searchInp') ? $id('searchInp').value : '').toLowerCase().trim();
+  var kelas  = $id('kelasFilter').value;
+  var search = ($id('searchInp')   ? $id('searchInp').value   : '').toLowerCase().trim();
   var nilaiF = ($id('nilaiFilter') ? $id('nilaiFilter').value : '');
 
   filteredStudents = allStudents.filter(function(s) {
-    if (kelas && s.kelas !== kelas) return false;
+    if (kelas  && s.kelas !== kelas) return false;
     if (search && s.nama.toLowerCase().indexOf(search) < 0) return false;
     if (nilaiF) {
       var cnt = countScores(s);
@@ -993,19 +1016,21 @@ function countScores(stu) {
 }
 
 function updateStats(kelas) {
-  var pool = kelas ? allStudents.filter(function(s) { return s.kelas === kelas; }) : allStudents;
+  var pool = kelas
+    ? allStudents.filter(function(s) { return s.kelas === kelas; })
+    : allStudents;
   var full = 0, part = 0, none = 0;
   for (var i = 0; i < pool.length; i++) {
     var c = countScores(pool[i]);
-    if (c >= 15) full++;
-    else if (c > 0) part++;
-    else none++;
+    if      (c >= 15) full++;
+    else if (c >  0)  part++;
+    else              none++;
   }
-  $id('statTotal').textContent  = pool.length;
-  $id('statKelas').textContent  = kelas || 'Semua kelas';
-  $id('statLengkap').textContent = full;
+  $id('statTotal').textContent    = pool.length;
+  $id('statKelas').textContent    = kelas || 'Semua kelas';
+  $id('statLengkap').textContent  = full;
   $id('statSebagian').textContent = part;
-  $id('statKosong').textContent  = none;
+  $id('statKosong').textContent   = none;
 }
 
 function renderTable() {
@@ -1015,69 +1040,83 @@ function renderTable() {
   $id('tableTitle').textContent = kelas ? 'Daftar Siswa — ' + kelas : 'Seluruh Siswa';
 
   if (!filteredStudents.length) {
-    tb.innerHTML = '<tr><td colspan="9"><div class="empty">' +
-      '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"/></svg>' +
-      '<p>Tidak ada data siswa yang cocok</p>' +
-      '</div></td></tr>';
+    tb.innerHTML =
+      '<tr><td colspan="9"><div class="empty">' +
+      '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">' +
+      '<path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"/>' +
+      '</svg><p>Tidak ada data siswa yang cocok</p></div></td></tr>';
     return;
   }
 
   var html = '';
   for (var i = 0; i < filteredStudents.length; i++) {
-    var s = filteredStudents[i];
-    var cnt = countScores(s);
+    var s         = filteredStudents[i];
+    var cnt       = countScores(s);
     var badgeClass = cnt >= 15 ? 'sc-full' : cnt > 0 ? 'sc-part' : 'sc-none';
     var badgeIcon  = cnt >= 15 ? '✅' : cnt > 0 ? '⏳' : '❌';
 
-    html += '<tr>' +
+    html +=
+      '<tr>' +
       '<td style="text-align:center"><input type="checkbox" class="row-cb item-cb" data-idx="' + i + '"></td>' +
-      '<td><span class="row-no">' + (i + 1) + '</span></td>' +
-      '<td><span class="row-name">' + escHtml(s.nama) + '</span></td>' +
-      '<td>' + escHtml(s.ttl) + '</td>' +
-      '<td>' + escHtml(s.nis) + '</td>' +
-      '<td>' + escHtml(s.nisn) + '</td>' +
+      '<td><span class="row-no">'  + (i + 1) + '</span></td>' +
+      '<td><span class="row-name">' + escHtml(s.nama)  + '</span></td>' +
+      '<td>' + escHtml(s.ttl)   + '</td>' +
+      '<td>' + escHtml(s.nis)   + '</td>' +
+      '<td>' + escHtml(s.nisn)  + '</td>' +
       '<td><span class="row-kelas">' + escHtml(s.kelas) + '</span></td>' +
       '<td><span class="sc-badge ' + badgeClass + '">' + badgeIcon + ' ' + cnt + '/15</span></td>' +
       '<td>' +
         '<div class="row-actions">' +
           '<button class="btn-prev" onclick="previewSKL(' + i + ')">👁️ Preview</button>' +
-          '<button class="btn-dl" onclick="downloadSKL(' + i + ')">📄 SKL</button>' +
+          '<button class="btn-dl"   onclick="downloadSKL(' + i + ')">📄 SKL</button>' +
         '</div>' +
       '</td>' +
-    '</tr>';
+      '</tr>';
   }
   tb.innerHTML = html;
   $id('cbAll').checked = false;
 }
 
-/* ═══════════════════════════════════════════════════
-   CHECKBOX
-   ═══════════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════ CHECKBOX ═══ */
 function toggleAll(el) {
   var cbs = document.querySelectorAll('.item-cb');
   for (var i = 0; i < cbs.length; i++) cbs[i].checked = el.checked;
 }
 
 /* ═══════════════════════════════════════════════════
-   PREVIEW MODAL
+   RATA-RATA
+   Gunakan nilai dari sheet (kolom W, idx 22) jika tersedia.
+   Jika kosong, hitung dari nilai yang ada.
    ═══════════════════════════════════════════════════ */
+function getRataRata(stu) {
+  /* Prioritas: nilai rata-rata dari sheet */
+  if (stu.nilaiRataRata && stu.nilaiRataRata !== '') return stu.nilaiRataRata;
+
+  /* Fallback: hitung manual dari 15 mata pelajaran */
+  var tot = 0, cnt = 0;
+  for (var j = 0; j < SUBJECTS.length; j++) {
+    var n = parseFloat(stu.scores[SUBJECTS[j].k]);
+    if (!isNaN(n)) { tot += n; cnt++; }
+  }
+  return cnt > 0 ? (tot / cnt).toFixed(2) : '0.00';
+}
+
+/* ═══════════════════════════════════════════════════ PREVIEW ═══ */
 function previewSKL(idx) {
   var s = filteredStudents[idx];
   if (!s) return showToast('Data tidak ditemukan', 'err');
   currentPreviewIndex = idx;
 
-  var tgl = formatDate();
-  var gA = [], gB = [];
-  var tot = 0, cnt = 0;
+  var tgl  = formatDate();
+  var avg  = getRataRata(s);
+  var gA   = [], gB = [];
+
   for (var i = 0; i < SUBJECTS.length; i++) {
     var sub = SUBJECTS[i];
     var val = s.scores[sub.k] || '';
     if (sub.g === 'A') gA.push({ name: sub.f, val: val });
     else               gB.push({ name: sub.f, val: val });
-    var n = parseFloat(val);
-    if (!isNaN(n)) { tot += n; cnt++; }
   }
-  var avg = cnt > 0 ? (tot / cnt).toFixed(2) : '0.00';
 
   var h = '<div class="skl-doc">';
   h += '<div class="skl-kop">';
@@ -1086,7 +1125,7 @@ function previewSKL(idx) {
   h += '<p>PEMERINTAH PROVINSI MALUKU</p>';
   h += '<p>DINAS PENDIDIKAN DAN KEBUDAYAAN</p>';
   h += '<h4>SMK NEGERI 1 MALUKU TENGAH</h4>';
-  h += '<p style="font-size:10px">Jl. Sultan Hasanuddin, ☎ (0914) 21354 — Kode Pos 97515</p>';
+  h += '<p style="font-size:10px">Jl. Sultan Hasanuddin, &#9990; (0914) 21354 — Kode Pos 97515</p>';
   h += '<p style="font-size:10px">e-mail: smkn1malukutengah@gmail.com</p>';
   h += '</div></div>';
   h += '<hr class="skl-divider">';
@@ -1105,13 +1144,21 @@ function previewSKL(idx) {
   h += '<table><thead><tr><th>No.</th><th>Mata Pelajaran</th><th>Nilai Ujian Sekolah</th></tr></thead><tbody>';
   h += '<tr><td style="text-align:left;font-weight:700" colspan="3"><b>A. Kelompok Mata Pelajaran Umum</b></td></tr>';
   for (var a = 0; a < gA.length; a++) {
-    h += '<tr><td>' + (a+1) + '</td><td style="text-align:left">' + escHtml(gA[a].name) + '</td><td>' + (gA[a].val || '—') + '</td></tr>';
+    h += '<tr><td>' + (a + 1) + '</td>' +
+         '<td style="text-align:left">' + escHtml(gA[a].name) + '</td>' +
+         '<td>' + (gA[a].val || '—') + '</td></tr>';
   }
   h += '<tr><td style="text-align:left;font-weight:700" colspan="3"><b>B. Kelompok Mata Pelajaran Kejuruan</b></td></tr>';
   for (var b = 0; b < gB.length; b++) {
-    h += '<tr><td>' + (b+1) + '</td><td style="text-align:left">' + escHtml(gB[b].name) + '</td><td>' + (gB[b].val || '—') + '</td></tr>';
+    h += '<tr><td>' + (b + 1) + '</td>' +
+         '<td style="text-align:left">' + escHtml(gB[b].name) + '</td>' +
+         '<td>' + (gB[b].val || '—') + '</td></tr>';
   }
-  h += '<tr><td>' + (gB.length + 1) + '</td><td style="text-align:left;font-weight:700"><b>Nilai Rata-Rata</b></td><td style="font-weight:700">' + avg + '</td></tr>';
+  h += '<tr>' +
+       '<td>' + (gB.length + 1) + '</td>' +
+       '<td style="text-align:left;font-weight:700"><b>Nilai Rata-Rata</b></td>' +
+       '<td style="font-weight:700">' + avg + '</td>' +
+       '</tr>';
   h += '</tbody></table>';
 
   h += '<p style="text-align:justify;margin:10px 0;font-size:12px">Surat Keterangan ini bersifat sementara dan berlaku sampai diterbitkannya Ijazah untuk siswa yang bersangkutan.</p>';
@@ -1130,7 +1177,11 @@ function previewSKL(idx) {
 }
 
 function field(label, val) {
-  return '<div class="skl-field"><span class="skl-flbl">' + label + '</span><span class="skl-fsep">:</span><span class="skl-fval">' + escHtml(val) + '</span></div>';
+  return '<div class="skl-field">' +
+         '<span class="skl-flbl">' + label + '</span>' +
+         '<span class="skl-fsep">:</span>' +
+         '<span class="skl-fval">' + escHtml(val) + '</span>' +
+         '</div>';
 }
 
 function closeModal() {
@@ -1144,12 +1195,13 @@ function downloadFromModal() {
   downloadSKL(currentPreviewIndex);
 }
 
-/* ═══════════════════════════════════════════════════
-   GENERATE SELECTED / ALL
-   ═══════════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════ BATCH ═══ */
 function generateSelected() {
-  var cbs = document.querySelectorAll('.item-cb:checked'), indices = [];
-  for (var i = 0; i < cbs.length; i++) indices.push(parseInt(cbs[i].getAttribute('data-idx')));
+  var cbs     = document.querySelectorAll('.item-cb:checked');
+  var indices = [];
+  for (var i = 0; i < cbs.length; i++) {
+    indices.push(parseInt(cbs[i].getAttribute('data-idx')));
+  }
   if (!indices.length) return showToast('Pilih minimal 1 siswa terlebih dahulu!', 'err');
   if (indices.length === 1) { downloadSKL(indices[0]); return; }
   batchDownload(indices);
@@ -1166,8 +1218,8 @@ function batchDownload(indices) {
   var total = indices.length, done = 0;
   var pw = $id('progressWrap'), pt = $id('progressText'), pf = $id('progressFill');
   pw.classList.add('show');
-  pt.textContent = 'Generating SKL 0/' + total + '...';
-  pf.style.width = '0%';
+  pt.textContent    = 'Generating SKL 0/' + total + '...';
+  pf.style.width    = '0%';
 
   function next(i) {
     if (i >= indices.length) {
@@ -1205,43 +1257,37 @@ function downloadSKL(idx) {
   });
 }
 
-/* ═══════════════════════════════════════════════════
-   BUILD DOCX
-   ═══════════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════ BUILD DOCX ═══ */
 function buildDocx(stu) {
-  var D = docx;
+  var D   = docx;
   var tgl = formatDate();
+  var avg = getRataRata(stu);
 
   var gA = [], gB = [];
-  var tot = 0, cnt = 0;
   for (var i = 0; i < SUBJECTS.length; i++) {
     var sub = SUBJECTS[i];
     var val = stu.scores[sub.k] || '';
     if (sub.g === 'A') gA.push({ name: sub.f, val: val });
     else               gB.push({ name: sub.f, val: val });
-    var n = parseFloat(val);
-    if (!isNaN(n)) { tot += n; cnt++; }
   }
-  var avg = cnt > 0 ? (tot / cnt).toFixed(2) : '0.00';
 
-  var brd = { style: D.BorderStyle.SINGLE, size: 1, color: '000000' };
-  var bds = { top: brd, bottom: brd, left: brd, right: brd };
-  var noBdr = { style: D.BorderStyle.NONE, size: 0, color: 'FFFFFF' };
+  var brd   = { style: D.BorderStyle.SINGLE, size: 1, color: '000000' };
+  var bds   = { top: brd, bottom: brd, left: brd, right: brd };
+  var noBdr = { style: D.BorderStyle.NONE,   size: 0, color: 'FFFFFF' };
   var noBds = { top: noBdr, bottom: noBdr, left: noBdr, right: noBdr };
-  var cm = { top: 40, bottom: 40, left: 80, right: 80 };
+  var cm    = { top: 40, bottom: 40, left: 80, right: 80 };
 
-  // Helper: table cell
   function tc(text, opts) {
     opts = opts || {};
     return new D.TableCell({
       borders: bds,
-      width: { size: opts.w || 1000, type: D.WidthType.DXA },
+      width:   { size: opts.w || 1000, type: D.WidthType.DXA },
       margins: cm,
       verticalAlign: D.VerticalAlign.CENTER,
       children: [new D.Paragraph({
         alignment: opts.a || D.AlignmentType.LEFT,
-        spacing: { before: 20, after: 20 },
-        children: [new D.TextRun({
+        spacing:   { before: 20, after: 20 },
+        children:  [new D.TextRun({
           text: String(text || ''),
           size: 20, font: 'Times New Roman', bold: !!opts.b
         })]
@@ -1249,10 +1295,9 @@ function buildDocx(stu) {
     });
   }
 
-  // Helper: field row (Nama : Nilai)
   function fl(label, value) {
     return new D.Paragraph({
-      spacing: { before: 60, after: 60, line: 276 },
+      spacing:  { before: 60, after: 60, line: 276 },
       tabStops: [
         { type: D.TabStopType.LEFT, position: 3600 },
         { type: D.TabStopType.LEFT, position: 3780 }
@@ -1266,13 +1311,12 @@ function buildDocx(stu) {
     });
   }
 
-  // Helper: centered paragraph
   function cp(text, opts) {
     opts = opts || {};
     return new D.Paragraph({
       alignment: opts.a || D.AlignmentType.CENTER,
-      spacing: { before: opts.sb || 0, after: opts.sa || 0, line: 240 },
-      children: [new D.TextRun({
+      spacing:   { before: opts.sb || 0, after: opts.sa || 0, line: 240 },
+      children:  [new D.TextRun({
         text: text, size: opts.sz || 22,
         font: 'Times New Roman', bold: !!opts.b,
         underline: opts.u ? { type: D.UnderlineType.SINGLE } : undefined
@@ -1280,19 +1324,17 @@ function buildDocx(stu) {
     });
   }
 
-  // Build table rows
+  /* Tabel nilai */
   var trows = [];
-  // Header
   trows.push(new D.TableRow({ tableHeader: true, children: [
     tc('No.',                 { w: 700,  a: D.AlignmentType.CENTER, b: 1 }),
     tc('Mata Pelajaran',      { w: 5600, a: D.AlignmentType.CENTER, b: 1 }),
     tc('Nilai Ujian Sekolah', { w: 1335, a: D.AlignmentType.CENTER, b: 1 })
   ]}));
-  // Group A
   trows.push(new D.TableRow({ children: [
     tc('A.', { w: 700, b: 1 }),
     tc('Kelompok Mata Pelajaran Umum', { w: 5600, b: 1 }),
-    tc('', { w: 1335 })
+    tc('',   { w: 1335 })
   ]}));
   for (var a = 0; a < gA.length; a++) {
     trows.push(new D.TableRow({ children: [
@@ -1301,11 +1343,10 @@ function buildDocx(stu) {
       tc(gA[a].val,     { w: 1335, a: D.AlignmentType.CENTER })
     ]}));
   }
-  // Group B
   trows.push(new D.TableRow({ children: [
     tc('B.', { w: 700, b: 1 }),
     tc('Kelompok Mata Pelajaran Kejuruan', { w: 5600, b: 1 }),
-    tc('', { w: 1335 })
+    tc('',   { w: 1335 })
   ]}));
   for (var b = 0; b < gB.length; b++) {
     trows.push(new D.TableRow({ children: [
@@ -1314,14 +1355,13 @@ function buildDocx(stu) {
       tc(gB[b].val,     { w: 1335, a: D.AlignmentType.CENTER })
     ]}));
   }
-  // Rata-rata
   trows.push(new D.TableRow({ children: [
     tc(String(gB.length + 1) + '.', { w: 700,  a: D.AlignmentType.CENTER }),
     tc('Nilai Rata-Rata',            { w: 5600, b: 1 }),
     tc(avg,                          { w: 1335, a: D.AlignmentType.CENTER, b: 1 })
   ]}));
 
-  // KOP SURAT (logo + teks dalam table tanpa border)
+  /* Kop surat */
   var kopTexts = [
     new D.Paragraph({ alignment: D.AlignmentType.CENTER, spacing: { before: 0, after: 0, line: 240 },
       children: [new D.TextRun({ text: 'PEMERINTAH PROVINSI MALUKU', size: 20, font: 'Times New Roman' })] }),
@@ -1337,8 +1377,7 @@ function buildDocx(stu) {
 
   var logoCell = logoBytes
     ? new D.TableCell({
-        borders: noBds,
-        width: { size: 1400, type: D.WidthType.DXA },
+        borders: noBds, width: { size: 1400, type: D.WidthType.DXA },
         verticalAlign: D.VerticalAlign.CENTER,
         margins: { top: 0, bottom: 0, left: 0, right: 80 },
         children: [new D.Paragraph({
@@ -1350,136 +1389,140 @@ function buildDocx(stu) {
           })]
         })]
       })
-    : new D.TableCell({ borders: noBds, width: { size: 1400, type: D.WidthType.DXA },
-        children: [new D.Paragraph({ children: [] })] });
+    : new D.TableCell({
+        borders: noBds, width: { size: 1400, type: D.WidthType.DXA },
+        children: [new D.Paragraph({ children: [] })]
+      });
 
   var textCell = new D.TableCell({
-    borders: noBds,
-    width: { size: 7235, type: D.WidthType.DXA },
+    borders: noBds, width: { size: 7235, type: D.WidthType.DXA },
     verticalAlign: D.VerticalAlign.CENTER,
     children: kopTexts
   });
 
-  // Assemble document content
+  /* Susun konten dokumen */
   var ch = [];
 
-  // KOP table
   ch.push(new D.Table({
     width: { size: 8635, type: D.WidthType.DXA },
     columnWidths: [1400, 7235],
     rows: [new D.TableRow({ children: [logoCell, textCell] })],
-    borders: { top: noBdr, bottom: noBdr, left: noBdr, right: noBdr,
-               insideHorizontal: noBdr, insideVertical: noBdr }
+    borders: {
+      top: noBdr, bottom: noBdr, left: noBdr, right: noBdr,
+      insideHorizontal: noBdr, insideVertical: noBdr
+    }
   }));
 
-  // Garis kop
   ch.push(new D.Paragraph({
     spacing: { before: 100, after: 0 },
-    border: { bottom: { style: D.BorderStyle.SINGLE, size: 6, color: '000000', space: 1 } },
+    border:  { bottom: { style: D.BorderStyle.SINGLE, size: 6, color: '000000', space: 1 } },
     children: []
   }));
 
-  // Title
   ch.push(cp('SURAT KETERANGAN LULUS', { sz: 22, b: 1, u: 1, sb: 220, sa: 0 }));
   ch.push(cp('Nomor: 421.5/     /2026', { sz: 20, sb: 60, sa: 180 }));
 
-  // Pembukaan
   ch.push(new D.Paragraph({
     alignment: D.AlignmentType.JUSTIFIED,
-    spacing: { before: 100, after: 100, line: 276 },
-    children: [new D.TextRun({
+    spacing:   { before: 100, after: 100, line: 276 },
+    children:  [new D.TextRun({
       text: 'Yang bertandatangan di bawah ini Kepala Sekolah Menengah Kejuruan Negeri 1 Maluku Tengah Nomor Pokok Sekolah Nasional 60100166 Kabupaten Maluku Tengah Provinsi Maluku. Dengan ini menerangkan:',
       size: 20, font: 'Times New Roman'
     })]
   }));
 
-  // Identitas siswa
   ch.push(fl('Nama', stu.nama));
   ch.push(fl('Tempat, Tanggal Lahir', stu.ttl));
   ch.push(fl('Nomor Induk', stu.nis));
   ch.push(fl('Nomor Induk Siswa Nasional', stu.nisn));
   ch.push(fl('Program Keahlian', stu.prog));
 
-  // Dinyatakan lulus
   ch.push(new D.Paragraph({
     alignment: D.AlignmentType.JUSTIFIED,
-    spacing: { before: 180, after: 60, line: 276 },
-    children: [new D.TextRun({
+    spacing:   { before: 180, after: 60, line: 276 },
+    children:  [new D.TextRun({
       text: 'Berdasarkan kriteria kelulusan peserta didik yang sudah ditetapkan, maka yang bersangkutan dinyatakan:',
       size: 20, font: 'Times New Roman'
     })]
   }));
+
   ch.push(new D.Paragraph({
     alignment: D.AlignmentType.CENTER,
-    spacing: { before: 100, after: 100 },
-    children: [new D.TextRun({ text: 'Lulus', size: 28, font: 'Times New Roman', bold: true })]
+    spacing:   { before: 100, after: 100 },
+    children:  [new D.TextRun({ text: 'Lulus', size: 28, font: 'Times New Roman', bold: true })]
   }));
+
   ch.push(new D.Paragraph({
-    spacing: { before: 60, after: 100 },
+    spacing:  { before: 60, after: 100 },
     children: [new D.TextRun({ text: 'Dengan hasil sebagai berikut:', size: 20, font: 'Times New Roman' })]
   }));
 
-  // Tabel nilai
   ch.push(new D.Table({
-    width: { size: 7635, type: D.WidthType.DXA },
+    width:        { size: 7635, type: D.WidthType.DXA },
     columnWidths: [700, 5600, 1335],
-    alignment: D.AlignmentType.CENTER,
-    rows: trows
+    alignment:    D.AlignmentType.CENTER,
+    rows:         trows
   }));
 
-  // Penutup
   ch.push(new D.Paragraph({
     alignment: D.AlignmentType.JUSTIFIED,
-    spacing: { before: 180, after: 60 },
-    children: [new D.TextRun({
+    spacing:   { before: 180, after: 60 },
+    children:  [new D.TextRun({
       text: 'Surat Keterangan ini bersifat sementara dan berlaku sampai diterbitkannya Ijazah untuk siswa yang bersangkutan.',
       size: 20, font: 'Times New Roman'
     })]
   }));
+
   ch.push(new D.Paragraph({
     alignment: D.AlignmentType.JUSTIFIED,
-    spacing: { before: 60, after: 180 },
-    children: [new D.TextRun({
+    spacing:   { before: 60, after: 180 },
+    children:  [new D.TextRun({
       text: 'Demikian Surat Keterangan ini diberikan agar dapat digunakan sebagaimana mestinya.',
       size: 20, font: 'Times New Roman'
     })]
   }));
 
-  // Tanda tangan
   ch.push(new D.Paragraph({
-    alignment: D.AlignmentType.RIGHT, spacing: { before: 100, after: 0 },
-    indent: { left: 5000 },
-    children: [new D.TextRun({ text: 'Maluku Tengah, ' + tgl, size: 20, font: 'Times New Roman' })]
+    alignment: D.AlignmentType.RIGHT,
+    spacing:   { before: 100, after: 0 },
+    indent:    { left: 5000 },
+    children:  [new D.TextRun({ text: 'Maluku Tengah, ' + tgl, size: 20, font: 'Times New Roman' })]
   }));
+
   ch.push(new D.Paragraph({
-    alignment: D.AlignmentType.RIGHT, spacing: { before: 0, after: 0 },
-    indent: { left: 5000 },
-    children: [new D.TextRun({ text: 'Kepala Sekolah,', size: 20, font: 'Times New Roman' })]
+    alignment: D.AlignmentType.RIGHT,
+    spacing:   { before: 0, after: 0 },
+    indent:    { left: 5000 },
+    children:  [new D.TextRun({ text: 'Kepala Sekolah,', size: 20, font: 'Times New Roman' })]
   }));
-  // Spasi tanda tangan
+
   for (var s2 = 0; s2 < 4; s2++) {
     ch.push(new D.Paragraph({ spacing: { before: 0, after: 0 }, children: [] }));
   }
+
   ch.push(new D.Paragraph({
-    alignment: D.AlignmentType.RIGHT, spacing: { before: 0, after: 0 },
-    indent: { left: 5000 },
-    children: [new D.TextRun({
+    alignment: D.AlignmentType.RIGHT,
+    spacing:   { before: 0, after: 0 },
+    indent:    { left: 5000 },
+    children:  [new D.TextRun({
       text: 'SIANI LA JAMALUDIN, S.Pd.,M.Pd',
       size: 20, font: 'Times New Roman', bold: true,
       underline: { type: D.UnderlineType.SINGLE }
     })]
   }));
+
   ch.push(new D.Paragraph({
-    alignment: D.AlignmentType.RIGHT, spacing: { before: 0 },
-    indent: { left: 5000 },
-    children: [new D.TextRun({ text: 'NIP 19760515200801 1 023', size: 20, font: 'Times New Roman' })]
+    alignment: D.AlignmentType.RIGHT,
+    spacing:   { before: 0 },
+    indent:    { left: 5000 },
+    children:  [new D.TextRun({ text: 'NIP 19760515200801 1 023', size: 20, font: 'Times New Roman' })]
   }));
 
   return D.Packer.toBlob(new D.Document({
     sections: [{
       properties: {
         page: {
-          size: { width: 11906, height: 16838 }, // A4
+          size:   { width: 11906, height: 16838 }, /* A4 */
           margin: { top: 1134, right: 1134, bottom: 1134, left: 1418 }
         }
       },
@@ -1488,21 +1531,15 @@ function buildDocx(stu) {
   }));
 }
 
-/* ═══════════════════════════════════════════════════
-   EVENT LISTENERS
-   ═══════════════════════════════════════════════════ */
-// Tutup modal klik overlay
+/* ═══════════════════════════════════════════════════ EVENTS ═══ */
 document.addEventListener('click', function(e) {
   if (e.target.id === 'modalOverlay') closeModal();
 });
-// Escape key
 document.addEventListener('keydown', function(e) {
   if (e.key === 'Escape' && $id('modalOverlay').classList.contains('show')) closeModal();
 });
 
-/* ═══════════════════════════════════════════════════
-   INIT
-   ═══════════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════ INIT ═══ */
 window.addEventListener('DOMContentLoaded', function() {
   loadLogo();
 });
