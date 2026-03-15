@@ -158,6 +158,74 @@
       margin-top: .5rem;
     }
 
+    /* ─── LIVE BADGE ─── */
+    .live-badge {
+      display: inline-flex; align-items: center; gap: .4rem;
+      background: rgba(5,150,105,.15);
+      border: 1px solid rgba(5,150,105,.35);
+      color: #34d399;
+      padding: .2rem .75rem;
+      border-radius: 20px; font-size: .75rem; font-weight: 600;
+      margin-top: .5rem; margin-left: .4rem;
+      transition: all .3s;
+    }
+    .live-badge.syncing {
+      background: rgba(6,182,212,.15);
+      border-color: rgba(6,182,212,.35);
+      color: var(--tealL);
+    }
+    .live-badge.error {
+      background: rgba(220,38,38,.15);
+      border-color: rgba(220,38,38,.35);
+      color: #f87171;
+    }
+    .live-dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: #34d399;
+      flex-shrink: 0;
+      animation: pulse-dot 2s ease-in-out infinite;
+    }
+    .live-badge.syncing .live-dot {
+      background: var(--tealL);
+      animation: spin-dot .8s linear infinite;
+    }
+    .live-badge.error .live-dot {
+      background: #f87171;
+      animation: none;
+    }
+    @keyframes pulse-dot {
+      0%,100% { opacity:1; transform:scale(1); }
+      50%      { opacity:.4; transform:scale(.7); }
+    }
+    @keyframes spin-dot {
+      to { transform: rotate(360deg); }
+    }
+
+    /* ─── LAST UPDATE BAR ─── */
+    .update-bar {
+      display: none;
+      padding: .5rem 1.8rem;
+      background: linear-gradient(90deg, rgba(5,150,105,.06), transparent);
+      border-bottom: 1px solid rgba(5,150,105,.15);
+      font-size: .78rem; color: var(--ok);
+      align-items: center; gap: .5rem;
+    }
+    .update-bar.show { display: flex; }
+    .update-bar.changed {
+      background: linear-gradient(90deg, rgba(6,182,212,.1), transparent);
+      border-color: rgba(6,182,212,.2);
+      color: var(--teal);
+      animation: flashBar .6s ease;
+    }
+    @keyframes flashBar {
+      0%   { background: rgba(6,182,212,.25); }
+      100% { background: linear-gradient(90deg, rgba(6,182,212,.1), transparent); }
+    }
+    .update-countdown {
+      margin-left: auto; color: var(--mute); font-size: .72rem;
+    }
+
     /* ─── MAIN WRAP ─── */
     .wrap {
       max-width: 1100px; margin: -1.5rem auto 0;
@@ -248,14 +316,24 @@
     /* ─── TABLE ─── */
     .tscroll { overflow-x: auto; }
     table { width: 100%; border-collapse: collapse; }
-    thead { background: var(--ink); }
-    th {
-      padding: .85rem 1rem; color: rgba(255,255,255,.8);
-      font-size: .75rem; font-weight: 600;
-      text-transform: uppercase; letter-spacing: .7px;
-      text-align: left; white-space: nowrap;
+    thead {
+      background: linear-gradient(135deg, var(--teal) 0%, #0c6480 100%);
+      position: sticky; top: 0; z-index: 1;
     }
-    th:last-child { text-align: center; }
+    th {
+      padding: .9rem 1rem;
+      color: #ffffff;
+      font-size: .8rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: .5px;
+      text-align: left; white-space: nowrap;
+      border-right: 1px solid rgba(255,255,255,.12);
+    }
+    th:last-child { text-align: center; border-right: none; }
+    th:first-child { text-align: center; }
+    /* Garis bawah header yang tegas */
+    thead tr {
+      border-bottom: 2px solid rgba(255,255,255,.25);
+    }
     tbody tr { border-bottom: 1px solid var(--border); transition: background .15s; }
     tbody tr:hover { background: #f0f9ff; }
     tbody tr:last-child { border-bottom: none; }
@@ -394,8 +472,8 @@
     .modal {
       background: var(--card);
       border-radius: var(--rl);
-      width: 94%; max-width: 680px;
-      max-height: 87vh; overflow-y: auto;
+      width: 94%; max-width: 760px;
+      max-height: 90vh; overflow-y: auto;
       box-shadow: 0 24px 70px rgba(0,0,0,.35);
       animation: modalUp .4s cubic-bezier(.16,1,.3,1) both;
       position: relative;
@@ -434,42 +512,52 @@
     /* ─── SKL PREVIEW (inside modal) ─── */
     .skl-doc {
       font-family: 'Times New Roman', Times, serif;
-      font-size: 12.5px; line-height: 1.55;
-      color: #000; max-width: 580px; margin: 0 auto;
+      font-size: 12px; line-height: 1.45;
+      color: #000; max-width: 600px; margin: 0 auto;
     }
-    .skl-kop { display: flex; align-items: center; gap: 12px; margin-bottom: 4px; }
+    .skl-kop { display: flex; align-items: center; gap: 12px; margin-bottom: 3px; }
     .skl-kop-logo { width: 60px; height: 68px; object-fit: contain; flex-shrink: 0; }
     .skl-kop-text { flex: 1; text-align: center; }
     .skl-kop-text h4 { font-size: 15px; font-weight: 700; margin: 1px 0; }
-    .skl-kop-text p { font-size: 10.5px; margin: 1px 0; }
-    .skl-divider { border: none; border-top: 3px double #000; margin: 7px 0 14px; }
+    .skl-kop-text p { font-size: 10px; margin: 1px 0; }
+    .skl-divider { border: none; border-top: 3px double #000; margin: 5px 0 10px; }
     .skl-title {
       text-align: center; font-weight: 700; text-decoration: underline;
-      font-size: 13.5px; margin: 14px 0 3px;
+      font-size: 13px; margin: 10px 0 2px;
     }
-    .skl-nomor { text-align: center; font-size: 11.5px; margin-bottom: 14px; }
-    .skl-field { display: flex; margin: 3px 0 3px 18px; }
+    .skl-nomor { text-align: center; font-size: 11px; margin-bottom: 10px; }
+    .skl-field { display: flex; margin: 2px 0 2px 18px; }
     .skl-flbl { min-width: 200px; }
     .skl-fsep { min-width: 14px; }
     .skl-fval { flex: 1; }
     .skl-lulus {
-      text-align: center; font-size: 17px; font-weight: 700;
-      letter-spacing: 4px; margin: 10px 0;
+      text-align: center; font-size: 16px; font-weight: 700;
+      letter-spacing: 4px; margin: 7px 0;
     }
-    .skl-doc table {
+    .skl-doc table, .skl-tbl {
       width: 100%; border-collapse: collapse;
-      margin: 10px 0; font-size: 11.5px;
+      margin: 7px 0; font-size: 11px;
     }
-    .skl-doc table th,
-    .skl-doc table td {
-      border: 1px solid #000; padding: 3px 7px;
+    .skl-doc table th, .skl-doc table td,
+    .skl-tbl th, .skl-tbl td {
+      border: 1px solid #000; padding: 2px 6px;
     }
-    .skl-doc table th { background: #f0f0f0; font-weight: 700; text-align: center; }
-    .skl-doc table td:first-child { text-align: center; width: 36px; }
-    .skl-doc table td:last-child  { text-align: center; width: 95px; }
-    .skl-sign { text-align: right; margin-top: 22px; padding-right: 18px; }
+    .skl-doc table th, .skl-tbl th {
+      background: #0e7490;
+      color: #ffffff;
+      font-weight: 700;
+      text-align: center;
+    }
+    .skl-tbl tr.subgrp td {
+      background: #e0f2f7;
+      color: #0e7490;
+      font-weight: 700;
+    }
+    .skl-doc table td:first-child, .skl-tbl td:first-child { text-align: center; width: 34px; }
+    .skl-doc table td:last-child,  .skl-tbl td:last-child  { text-align: center; width: 88px; }
+    .skl-sign { text-align: right; margin-top: 14px; padding-right: 18px; }
     .skl-sign p { margin: 1px 0; }
-    .skl-sign-name { font-weight: 700; text-decoration: underline; margin-top: 56px; }
+    .skl-sign-name { font-weight: 700; text-decoration: underline; }
 
     /* ─── FILTER ─── */
     .filter-bar {
@@ -486,6 +574,20 @@
       outline: none; transition: all .2s;
     }
     .filter-inp:focus { border-color: var(--teal); box-shadow: 0 0 0 3px var(--tealGlow); }
+
+    /* ─── EXTRA BUTTON STYLES ─── */
+    .abtn-green {
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: #fff; box-shadow: 0 3px 14px rgba(16,185,129,.25);
+    }
+    .btn-print {
+      padding: .35rem .6rem; border-radius: var(--rs);
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: #fff; border: none; cursor: pointer;
+      font-size: .7rem; font-weight: 700; font-family: inherit;
+      white-space: nowrap; transition: all .2s;
+    }
+    .btn-print:hover { transform: scale(1.04); box-shadow: 0 2px 10px rgba(16,185,129,.3); }
 
     /* ─── FOOTER ─── */
     footer { text-align: center; padding: 2rem; color: var(--mute); font-size: .8rem; }
@@ -524,7 +626,9 @@
     </div>
     <div class="modal-body" id="modalBody"></div>
     <div class="modal-foot">
-      <button class="abtn abtn-purple" onclick="downloadFromModal()">📥 Download .docx</button>
+      <button class="abtn abtn-green"  onclick="printFromModal()">🖨️ Print / Cetak</button>
+      <button class="abtn abtn-teal"   onclick="downloadPDFFromModal()">📄 Download PDF</button>
+      <button class="abtn abtn-purple" onclick="downloadFromModal()">📝 Download .docx</button>
       <button class="abtn" style="background:var(--surf);color:var(--ink2);border:2px solid var(--border);" onclick="closeModal()">✖ Tutup</button>
     </div>
   </div>
@@ -555,7 +659,11 @@
       <div>
         <h1>SMK Negeri 1 Maluku Tengah</h1>
         <p>Generator Surat Keterangan Lulus — Tahun Ajaran 2025/2026</p>
-        <span class="hero-badge">📜 SKL Generator v3</span>
+        <span class="hero-badge">📜 SKL Generator v4 — Kertas F4</span>
+        <span class="live-badge" id="liveBadge">
+          <span class="live-dot"></span>
+          <span id="liveText">Menghubungkan...</span>
+        </span>
       </div>
     </div>
   </header>
@@ -617,6 +725,13 @@
           </div>
         </div>
 
+        <!-- LIVE UPDATE BAR -->
+        <div class="update-bar" id="updateBar">
+          <span id="updateIcon">🔄</span>
+          <span id="updateMsg">Data tersinkronisasi</span>
+          <span class="update-countdown" id="updateCountdown">Refresh dalam 30s</span>
+        </div>
+
         <!-- SEARCH -->
         <div class="filter-bar">
           <input type="text" class="filter-inp" id="searchInp"
@@ -639,15 +754,15 @@
           <table>
             <thead>
               <tr>
-                <th style="width:32px;text-align:center;"></th>
-                <th>#</th>
+                <th style="width:38px;text-align:center;">✓</th>
+                <th style="width:42px;">No.</th>
                 <th>Nama Siswa</th>
                 <th>Tempat / Tgl Lahir</th>
-                <th>NIS</th>
-                <th>NISN</th>
-                <th>Kelas</th>
-                <th>Nilai</th>
-                <th style="text-align:center;">Aksi</th>
+                <th style="width:80px;">NIS</th>
+                <th style="width:110px;">NISN</th>
+                <th style="width:90px;">Kelas</th>
+                <th style="width:90px;">Status Nilai</th>
+                <th style="text-align:center;width:160px;">Aksi</th>
               </tr>
             </thead>
             <tbody id="tbody"></tbody>
@@ -662,9 +777,10 @@
 
         <!-- ACTIONS -->
         <div class="actions-bar">
-          <button class="abtn abtn-teal" onclick="generateSelected()">📦 Generate SKL Terpilih</button>
-          <button class="abtn abtn-purple" onclick="generateAll()">📥 Generate Semua SKL</button>
-          <button class="abtn abtn-gold" onclick="reloadData()">🔄 Refresh Data</button>
+          <button class="abtn abtn-teal"   onclick="generateSelected()">📦 Generate SKL Terpilih</button>
+          <button class="abtn abtn-purple" onclick="generateAll()">📝 Download Semua .docx</button>
+          <button class="abtn abtn-teal"   onclick="printSelected()" style="background:linear-gradient(135deg,#10b981,#059669);box-shadow:0 3px 14px rgba(16,185,129,.25)">🖨️ Print Terpilih</button>
+          <button class="abtn abtn-gold"   onclick="reloadData()">🔄 Refresh Data</button>
         </div>
       </div>
     </div>
@@ -674,6 +790,8 @@
 
 <script src="https://unpkg.com/docx@9.5.1/build/index.umd.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script>
 /* ═══════════════════════════════════════════════════
    CONFIG
@@ -771,6 +889,10 @@ var filteredStudents = [];
 var logoBytes        = null;
 var currentPreviewIndex = -1;
 var gvizCounter      = 0;
+var autoRefreshTimer = null;   /* interval handle untuk auto-refresh */
+var lastRefreshTime  = null;   /* waktu fetch terakhir berhasil */
+var AUTO_REFRESH_MS  = 30000;  /* polling setiap 30 detik */
+var isRefreshing     = false;  /* flag agar tidak double-fetch */
 
 /* ═══════════════════════════════════════════════════ UTILS ═══ */
 function $id(id) { return document.getElementById(id); }
@@ -903,82 +1025,248 @@ function gvizFetch(range) {
      idx 21 = Mapel Pilihan
      idx 22 = Nilai Rata-Rata (dari sheet)
    ═══════════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════
+   LOAD DATA — fetch pertama (tampilkan spinner penuh)
+   ═══════════════════════════════════════════════════ */
 function loadData() {
   $id('spMain').classList.add('show');
   $id('tableContent').style.display = 'none';
+  setLiveBadge('syncing', 'Memuat data...');
 
-  /* Ambil A2:V300 — kolom A s/d V (idx 0–21), V = Nilai Rata-Rata
-     Mapping dikonfirmasi dari file Excel:
-       idx 0-5  = Nama, TTL, NIS, NISN, Program, Kelas
-       idx 6    = Pend. Agama (G) — LANGSUNG, tidak ada spacer
-       idx 7-12 = Pend.Pancasila, Bhs.Indonesia, PJOK, Sejarah, Seni Budaya, Mulok
-       idx 13-20= Matematika, Bhs.Inggris, Informatika, ProjekIPAS, DPK, KK, PKK, MapelPilihan
-       idx 21   = Nilai Rata-Rata (V)
-  */
+  fetchSheetData(function(students, err) {
+    $id('spMain').classList.remove('show');
+    $id('tableContent').style.display = 'block';
+    $id('statsRow').style.display = '';
+
+    if (err) {
+      $id('tbody').innerHTML =
+        '<tr><td colspan="9"><div class="empty">' +
+        '<p>⚠️ ' + escHtml(err) + '</p>' +
+        '<p style="margin-top:.5rem;font-size:.8rem;">Pastikan spreadsheet dibagikan publik (Anyone with link can view)</p>' +
+        '</div></td></tr>';
+      setLiveBadge('error', 'Gagal memuat');
+      showToast('Gagal memuat data: ' + err, 'err');
+      return;
+    }
+
+    allStudents = students;
+    lastRefreshTime = new Date();
+    applyFilter();
+    showUpdateBar(false);
+    setLiveBadge('live', 'Live · ' + allStudents.length + ' siswa');
+    showToast('✅ Data dimuat: ' + allStudents.length + ' siswa', 'ok');
+    console.log('[SKL] Total siswa dimuat:', allStudents.length);
+
+    /* Mulai auto-refresh setelah data pertama berhasil */
+    startAutoRefresh();
+  });
+}
+
+/* ═══════════════════════════════════════════════════
+   SILENT REFRESH — fetch ulang di background tanpa
+   mengganggu tampilan, bandingkan dengan data lama
+   ═══════════════════════════════════════════════════ */
+function silentRefresh() {
+  if (isRefreshing) return;
+  isRefreshing = true;
+  setLiveBadge('syncing', 'Sinkronisasi...');
+
+  fetchSheetData(function(students, err) {
+    isRefreshing = false;
+
+    if (err) {
+      /* Gagal sinkronisasi — jangan reset data lama, cukup log */
+      setLiveBadge('live', 'Live · ' + allStudents.length + ' siswa');
+      console.warn('[SKL] Silent refresh gagal:', err);
+      return;
+    }
+
+    /* Bandingkan data baru vs lama */
+    var changed = detectChanges(allStudents, students);
+
+    allStudents = students;
+    lastRefreshTime = new Date();
+
+    if (changed.any) {
+      /* Ada perubahan — perbarui tabel & tampilkan notifikasi */
+      applyFilter();
+      showUpdateBar(true, changed);
+      showToast('🔄 Data diperbarui dari Google Sheets!', 'ok');
+      console.log('[SKL] Perubahan terdeteksi:', changed);
+    } else {
+      showUpdateBar(false);
+    }
+
+    setLiveBadge('live', 'Live · ' + allStudents.length + ' siswa');
+  });
+}
+
+/* ═══════════════════════════════════════════════════
+   FETCH SHEET DATA — core fetch, callback(students, errMsg)
+   ═══════════════════════════════════════════════════ */
+function fetchSheetData(cb) {
   gvizFetch('A2:V300').then(function(rows) {
-    allStudents = [];
+    var students = [];
 
     for (var i = 0; i < rows.length; i++) {
       var r    = rows[i];
       var nama = String(r[0] || '').trim();
-      if (!nama) continue;  /* lewati baris kosong */
+      if (!nama) continue;
 
-      /* Baca nilai setiap mata pelajaran dari index yang tepat */
       var scores = {};
       for (var j = 0; j < SUBJECTS.length; j++) {
-        var idx  = SUBJECTS[j].idx;          /* index langsung (0-based) */
-        var raw  = (r[idx] != null) ? String(r[idx]).trim() : '';
-        /* Abaikan nilai yang tidak masuk akal (error formula) */
-        if (raw === '#REF!' || raw === '#N/A' || raw === '#VALUE!' || raw === '#ERROR!') {
-          raw = '';
-        }
+        var si  = SUBJECTS[j].idx;
+        var raw = (r[si] != null) ? String(r[si]).trim() : '';
+        if (raw === '#REF!' || raw === '#N/A' || raw === '#VALUE!' || raw === '#ERROR!') raw = '';
         scores[SUBJECTS[j].k] = raw;
       }
 
-      /* Nilai rata-rata langsung dari kolom V (idx 21) */
       var nilaiRataRata = '';
       if (r[21] != null) {
         var rv = String(r[21]).trim();
-        if (rv !== '#REF!' && rv !== '#N/A' && rv !== '#VALUE!' && rv !== '#ERROR!') {
-          nilaiRataRata = rv;
-        }
+        if (rv !== '#REF!' && rv !== '#N/A' && rv !== '#VALUE!' && rv !== '#ERROR!') nilaiRataRata = rv;
       }
 
-      allStudents.push({
-        nama:          nama,
-        ttl:           String(r[1] || '').trim(),
-        nis:           String(r[2] || '').trim(),
-        nisn:          String(r[3] || '').trim(),
-        prog:          String(r[4] || '').trim(),
-        kelas:         String(r[5] || '').trim(),
-        scores:        scores,
+      students.push({
+        nama: nama,
+        ttl:  String(r[1] || '').trim(),
+        nis:  String(r[2] || '').trim(),
+        nisn: String(r[3] || '').trim(),
+        prog: String(r[4] || '').trim(),
+        kelas:String(r[5] || '').trim(),
+        scores: scores,
         nilaiRataRata: nilaiRataRata
       });
     }
 
-    $id('spMain').classList.remove('show');
-    $id('tableContent').style.display = 'block';
-    $id('statsRow').style.display     = '';
-
-    applyFilter();
-    showToast('✅ Data berhasil dimuat: ' + allStudents.length + ' siswa', 'ok');
-    console.log('[SKL] Total siswa dimuat:', allStudents.length);
+    cb(students, null);
   }).catch(function(e) {
-    $id('spMain').classList.remove('show');
-    $id('tableContent').style.display = 'block';
-    $id('tbody').innerHTML =
-      '<tr><td colspan="9"><div class="empty">' +
-      '<p>⚠️ ' + escHtml(e.message) + '</p>' +
-      '<p style="margin-top:.5rem;font-size:.8rem;">Pastikan spreadsheet dibagikan publik (Anyone with link can view)</p>' +
-      '</div></td></tr>';
-    showToast('Gagal memuat data: ' + e.message, 'err');
+    cb(null, e.message);
   });
 }
 
+/* ═══════════════════════════════════════════════════
+   DETECT CHANGES — bandingkan array siswa lama vs baru
+   ═══════════════════════════════════════════════════ */
+function detectChanges(oldArr, newArr) {
+  var res = { any: false, added: 0, removed: 0, updated: 0, details: [] };
+
+  if (oldArr.length !== newArr.length) {
+    res.any = true;
+    res.added   = Math.max(0, newArr.length - oldArr.length);
+    res.removed = Math.max(0, oldArr.length - newArr.length);
+  }
+
+  /* Buat map lama berdasarkan NIS */
+  var oldMap = {};
+  for (var i = 0; i < oldArr.length; i++) {
+    if (oldArr[i].nis) oldMap[oldArr[i].nis] = oldArr[i];
+  }
+
+  for (var j = 0; j < newArr.length; j++) {
+    var ns = newArr[j];
+    var os = oldMap[ns.nis];
+    if (!os) continue;
+
+    /* Cek apakah ada nilai yang berubah */
+    for (var k = 0; k < SUBJECTS.length; k++) {
+      var key = SUBJECTS[k].k;
+      if ((os.scores[key] || '') !== (ns.scores[key] || '')) {
+        res.any = true;
+        res.updated++;
+        res.details.push(ns.nama);
+        break;
+      }
+    }
+    if ((os.nilaiRataRata || '') !== (ns.nilaiRataRata || '')) {
+      if (!res.details.includes(ns.nama)) {
+        res.any = true; res.updated++;
+        res.details.push(ns.nama);
+      }
+    }
+  }
+
+  return res;
+}
+
+/* ═══════════════════════════════════════════════════
+   AUTO-REFRESH — mulai/stop interval + countdown timer
+   ═══════════════════════════════════════════════════ */
+var countdownSec   = 0;
+var countdownTimer = null;
+
+function startAutoRefresh() {
+  stopAutoRefresh();
+
+  countdownSec = AUTO_REFRESH_MS / 1000;
+  updateCountdown();
+
+  /* Countdown ticker setiap detik */
+  countdownTimer = setInterval(function() {
+    countdownSec--;
+    if (countdownSec <= 0) countdownSec = AUTO_REFRESH_MS / 1000;
+    updateCountdown();
+  }, 1000);
+
+  /* Polling interval */
+  autoRefreshTimer = setInterval(function() {
+    countdownSec = AUTO_REFRESH_MS / 1000;
+    silentRefresh();
+  }, AUTO_REFRESH_MS);
+}
+
+function stopAutoRefresh() {
+  if (autoRefreshTimer)  { clearInterval(autoRefreshTimer);  autoRefreshTimer  = null; }
+  if (countdownTimer)    { clearInterval(countdownTimer);    countdownTimer    = null; }
+}
+
+function updateCountdown() {
+  var el = $id('updateCountdown');
+  if (!el) return;
+  el.textContent = 'Refresh otomatis dalam ' + countdownSec + 's';
+}
+
 function reloadData() {
-  allStudents      = [];
-  filteredStudents = [];
+  stopAutoRefresh();
+  allStudents = []; filteredStudents = [];
   loadData();
+}
+
+/* ═══════════════════════════════════════════════════
+   UI HELPERS — live badge & update bar
+   ═══════════════════════════════════════════════════ */
+function setLiveBadge(state, text) {
+  var badge = $id('liveBadge');
+  var txt   = $id('liveText');
+  if (!badge || !txt) return;
+  badge.className = 'live-badge' + (state === 'syncing' ? ' syncing' : state === 'error' ? ' error' : '');
+  txt.textContent = text;
+}
+
+function showUpdateBar(changed, changeInfo) {
+  var bar = $id('updateBar');
+  var msg = $id('updateMsg');
+  var ico = $id('updateIcon');
+  if (!bar) return;
+
+  bar.classList.add('show');
+
+  if (changed && changeInfo) {
+    bar.classList.add('changed');
+    setTimeout(function() { bar.classList.remove('changed'); }, 700);
+    ico.textContent = '✨';
+
+    var parts = [];
+    if (changeInfo.added   > 0) parts.push(changeInfo.added   + ' siswa baru');
+    if (changeInfo.removed > 0) parts.push(changeInfo.removed + ' siswa dihapus');
+    if (changeInfo.updated > 0) parts.push(changeInfo.updated + ' nilai diperbarui');
+    msg.textContent = 'Data berubah: ' + parts.join(', ');
+  } else {
+    ico.textContent = '✅';
+    var t = lastRefreshTime;
+    var jam = t ? (('0' + t.getHours()).slice(-2) + ':' + ('0' + t.getMinutes()).slice(-2) + ':' + ('0' + t.getSeconds()).slice(-2)) : '--:--';
+    msg.textContent = 'Tersinkronisasi pukul ' + jam;
+  }
 }
 
 /* ═══════════════════════════════════════════════════ FILTER ═══ */
@@ -1067,8 +1355,9 @@ function renderTable() {
       '<td><span class="sc-badge ' + badgeClass + '">' + badgeIcon + ' ' + cnt + '/15</span></td>' +
       '<td>' +
         '<div class="row-actions">' +
-          '<button class="btn-prev" onclick="previewSKL(' + i + ')">👁️ Preview</button>' +
-          '<button class="btn-dl"   onclick="downloadSKL(' + i + ')">📄 SKL</button>' +
+          '<button class="btn-prev"  onclick="previewSKL(' + i + ')">👁️ Preview</button>' +
+          '<button class="btn-print" onclick="printSKL(' + i + ')">🖨️ Print</button>' +
+          '<button class="btn-dl"    onclick="downloadSKL(' + i + ')">📝 docx</button>' +
         '</div>' +
       '</td>' +
       '</tr>';
@@ -1107,13 +1396,137 @@ function previewSKL(idx) {
   if (!s) return showToast('Data tidak ditemukan', 'err');
   currentPreviewIndex = idx;
 
-  var tgl  = formatDate();
-  var avg  = getRataRata(s);
-  var gA   = [], gB = [];
+  $id('modalBody').innerHTML = buildSKLHtml(s);
+  $id('modalOverlay').classList.add('show');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal() {
+  $id('modalOverlay').classList.remove('show');
+  document.body.style.overflow = '';
+  currentPreviewIndex = -1;
+}
+
+function downloadFromModal() {
+  if (currentPreviewIndex < 0) return;
+  downloadSKL(currentPreviewIndex);
+}
+
+function printFromModal() {
+  if (currentPreviewIndex < 0) return;
+  printSKL(currentPreviewIndex);
+}
+
+function downloadPDFFromModal() {
+  if (currentPreviewIndex < 0) return;
+  downloadPDF(currentPreviewIndex);
+}
+
+/* ═══════════════════════════════════════════════════
+   PRINT — buka jendela print browser dengan layout A4 bersih
+   ═══════════════════════════════════════════════════ */
+function printSKL(idx) {
+  var stu = filteredStudents[idx];
+  if (!stu) return showToast('Data tidak ditemukan', 'err');
+
+  var sklHtml = buildSKLHtml(stu);
+
+  var printWin = window.open('', '_blank', 'width=816,height=1252');
+  printWin.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8">');
+  printWin.document.write('<title>SKL — ' + stu.nama + '</title>');
+  printWin.document.write('<style>');
+  printWin.document.write(getSKLPrintCSS());
+  printWin.document.write('body{padding:1.5cm 2.5cm 1.5cm 3cm}');
+  printWin.document.write('@media print{body{margin:0;padding:0}@page{size:215.9mm 330.2mm;margin:1.5cm 2.5cm 1.5cm 3cm}}');
+  printWin.document.write('</style></head><body>');
+  printWin.document.write(sklHtml);
+  printWin.document.write('</body></html>');
+  printWin.document.close();
+
+  /* Tunggu gambar logo load lalu print */
+  printWin.onload = function() {
+    setTimeout(function() {
+      printWin.focus();
+      printWin.print();
+    }, 600);
+  };
+}
+
+/* ═══════════════════════════════════════════════════
+   DOWNLOAD PDF — render ke canvas lalu simpan PDF A4
+   ═══════════════════════════════════════════════════ */
+function downloadPDF(idx) {
+  var stu = filteredStudents[idx];
+  if (!stu) return showToast('Data tidak ditemukan', 'err');
+
+  showToast('⏳ Membuat PDF ' + stu.nama + '...', '');
+
+  /* Buat div render tersembunyi */
+  var container = document.createElement('div');
+  container.style.cssText =
+    'position:fixed;left:-9999px;top:0;width:816px;background:#fff;padding:57px 95px 57px 114px;' +
+    'font-family:"Times New Roman",Times,serif;font-size:12px;line-height:1.45;color:#000;z-index:-1;';
+  container.innerHTML = buildSKLHtml(stu);
+  document.body.appendChild(container);
+
+  /* Inject inline styles untuk komponen SKL */
+  var styleEl = document.createElement('style');
+  styleEl.textContent = getSKLPrintCSS();
+  container.prepend(styleEl);
+
+  html2canvas(container, {
+    scale: 2,
+    useCORS: true,
+    allowTaint: true,
+    backgroundColor: '#ffffff',
+    width: 816,
+    windowWidth: 816
+  }).then(function(canvas) {
+    document.body.removeChild(container);
+
+    var imgData = canvas.toDataURL('image/jpeg', 0.95);
+    var pdf     = new window.jspdf.jsPDF({ orientation: 'portrait', unit: 'mm', format: [215.9, 330.2] });
+    var pageW   = pdf.internal.pageSize.getWidth();
+    var pageH   = pdf.internal.pageSize.getHeight();
+
+    /* Hitung tinggi proporsional */
+    var imgW  = canvas.width;
+    var imgH  = canvas.height;
+    var ratio = pageW / (imgW / 2);   /* /2 karena scale:2 */
+    var pdfH  = (imgH / 2) * ratio;
+
+    if (pdfH <= pageH) {
+      pdf.addImage(imgData, 'JPEG', 0, 0, pageW, pdfH);
+    } else {
+      /* Multi-halaman jika konten melebihi satu halaman A4 */
+      var yOffset = 0;
+      while (yOffset < pdfH) {
+        if (yOffset > 0) pdf.addPage();
+        pdf.addImage(imgData, 'JPEG', 0, -yOffset, pageW, pdfH);
+        yOffset += pageH;
+      }
+    }
+
+    pdf.save('SKL_' + stu.nama.replace(/\s+/g, '_') + '.pdf');
+    showToast('✅ PDF ' + stu.nama + ' berhasil diunduh!', 'ok');
+  }).catch(function(e) {
+    document.body.removeChild(container);
+    console.error(e);
+    showToast('Gagal buat PDF: ' + e.message, 'err');
+  });
+}
+
+/* ═══════════════════════════════════════════════════
+   BUILD SKL HTML — dipakai oleh preview, print & PDF
+   ═══════════════════════════════════════════════════ */
+function buildSKLHtml(stu) {
+  var tgl = formatDate();
+  var avg = getRataRata(stu);
+  var gA  = [], gB = [];
 
   for (var i = 0; i < SUBJECTS.length; i++) {
     var sub = SUBJECTS[i];
-    var val = s.scores[sub.k] || '';
+    var val = stu.scores[sub.k] || '';
     if (sub.g === 'A') gA.push({ name: sub.f, val: val });
     else               gB.push({ name: sub.f, val: val });
   }
@@ -1131,24 +1544,24 @@ function previewSKL(idx) {
   h += '<hr class="skl-divider">';
   h += '<div class="skl-title">SURAT KETERANGAN LULUS</div>';
   h += '<div class="skl-nomor">Nomor: 421.5/&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/2026</div>';
-  h += '<p style="text-align:justify;margin-bottom:10px;font-size:12px">Yang bertandatangan di bawah ini Kepala Sekolah Menengah Kejuruan Negeri 1 Maluku Tengah Nomor Pokok Sekolah Nasional 60100166 Kabupaten Maluku Tengah Provinsi Maluku. Dengan ini menerangkan:</p>';
-  h += field('Nama', s.nama);
-  h += field('Tempat, Tanggal Lahir', s.ttl);
-  h += field('Nomor Induk', s.nis);
-  h += field('Nomor Induk Siswa Nasional', s.nisn);
-  h += field('Program Keahlian', s.prog);
-  h += '<p style="margin:12px 0 6px;text-align:justify;font-size:12px">Berdasarkan kriteria kelulusan peserta didik yang sudah ditetapkan, maka yang bersangkutan dinyatakan:</p>';
+  h += '<p style="text-align:justify;margin-bottom:7px;font-size:12px">Yang bertandatangan di bawah ini Kepala Sekolah Menengah Kejuruan Negeri 1 Maluku Tengah Nomor Pokok Sekolah Nasional 60100166 Kabupaten Maluku Tengah Provinsi Maluku. Dengan ini menerangkan:</p>';
+  h += sklField('Nama', stu.nama);
+  h += sklField('Tempat, Tanggal Lahir', stu.ttl);
+  h += sklField('Nomor Induk', stu.nis);
+  h += sklField('Nomor Induk Siswa Nasional', stu.nisn);
+  h += sklField('Program Keahlian', stu.prog);
+  h += '<p style="margin:8px 0 4px;text-align:justify;font-size:12px">Berdasarkan kriteria kelulusan peserta didik yang sudah ditetapkan, maka yang bersangkutan dinyatakan:</p>';
   h += '<div class="skl-lulus">L U L U S</div>';
-  h += '<p style="margin:6px 0;font-size:12px">Dengan hasil sebagai berikut:</p>';
+  h += '<p style="margin:4px 0;font-size:12px">Dengan hasil sebagai berikut:</p>';
 
-  h += '<table><thead><tr><th>No.</th><th>Mata Pelajaran</th><th>Nilai Ujian Sekolah</th></tr></thead><tbody>';
-  h += '<tr><td style="text-align:left;font-weight:700" colspan="3"><b>A. Kelompok Mata Pelajaran Umum</b></td></tr>';
+  h += '<table class="skl-tbl"><thead><tr><th>No.</th><th>Mata Pelajaran</th><th>Nilai</th></tr></thead><tbody>';
+  h += '<tr class="subgrp"><td style="text-align:left" colspan="3"><b>A. Kelompok Mata Pelajaran Umum</b></td></tr>';
   for (var a = 0; a < gA.length; a++) {
     h += '<tr><td>' + (a + 1) + '</td>' +
          '<td style="text-align:left">' + escHtml(gA[a].name) + '</td>' +
          '<td>' + (gA[a].val || '—') + '</td></tr>';
   }
-  h += '<tr><td style="text-align:left;font-weight:700" colspan="3"><b>B. Kelompok Mata Pelajaran Kejuruan</b></td></tr>';
+  h += '<tr class="subgrp"><td style="text-align:left" colspan="3"><b>B. Kelompok Mata Pelajaran Kejuruan</b></td></tr>';
   for (var b = 0; b < gB.length; b++) {
     h += '<tr><td>' + (b + 1) + '</td>' +
          '<td style="text-align:left">' + escHtml(gB[b].name) + '</td>' +
@@ -1161,22 +1574,20 @@ function previewSKL(idx) {
        '</tr>';
   h += '</tbody></table>';
 
-  h += '<p style="text-align:justify;margin:10px 0;font-size:12px">Surat Keterangan ini bersifat sementara dan berlaku sampai diterbitkannya Ijazah untuk siswa yang bersangkutan.</p>';
-  h += '<p style="text-align:justify;margin-bottom:14px;font-size:12px">Demikian Surat Keterangan ini diberikan agar dapat digunakan sebagaimana mestinya.</p>';
+  h += '<p style="text-align:justify;margin:7px 0;font-size:12px">Surat Keterangan ini bersifat sementara dan berlaku sampai diterbitkannya Ijazah untuk siswa yang bersangkutan.</p>';
+  h += '<p style="text-align:justify;margin-bottom:10px;font-size:12px">Demikian Surat Keterangan ini diberikan agar dapat digunakan sebagaimana mestinya.</p>';
   h += '<div class="skl-sign">';
   h += '<p>Maluku Tengah, ' + tgl + '</p>';
   h += '<p>Kepala Sekolah,</p>';
+  h += '<div style="height:48px"></div>';
   h += '<p class="skl-sign-name">SIANI LA JAMALUDIN, S.Pd.,M.Pd</p>';
   h += '<p>NIP 19760515200801 1 023</p>';
   h += '</div>';
   h += '</div>';
-
-  $id('modalBody').innerHTML = h;
-  $id('modalOverlay').classList.add('show');
-  document.body.style.overflow = 'hidden';
+  return h;
 }
 
-function field(label, val) {
+function sklField(label, val) {
   return '<div class="skl-field">' +
          '<span class="skl-flbl">' + label + '</span>' +
          '<span class="skl-fsep">:</span>' +
@@ -1184,15 +1595,36 @@ function field(label, val) {
          '</div>';
 }
 
-function closeModal() {
-  $id('modalOverlay').classList.remove('show');
-  document.body.style.overflow = '';
-  currentPreviewIndex = -1;
-}
-
-function downloadFromModal() {
-  if (currentPreviewIndex < 0) return;
-  downloadSKL(currentPreviewIndex);
+/* CSS untuk print/PDF (dipakai oleh printSKL dan downloadPDF) */
+function getSKLPrintCSS() {
+  return [
+    '*{margin:0;padding:0;box-sizing:border-box}',
+    'body{font-family:"Times New Roman",Times,serif;font-size:12px;line-height:1.45;color:#000;background:#fff}',
+    '.skl-doc{max-width:100%;font-family:"Times New Roman",Times,serif;font-size:12px;line-height:1.45;color:#000}',
+    '.skl-kop{display:flex;align-items:center;gap:12px;margin-bottom:3px}',
+    '.skl-kop-logo{width:58px;height:66px;object-fit:contain;flex-shrink:0}',
+    '.skl-kop-text{flex:1;text-align:center}',
+    '.skl-kop-text h4{font-size:15px;font-weight:700;margin:1px 0}',
+    '.skl-kop-text p{font-size:10px;margin:1px 0}',
+    '.skl-divider{border:none;border-top:3px double #000;margin:5px 0 10px}',
+    '.skl-title{text-align:center;font-weight:700;text-decoration:underline;font-size:13px;margin:10px 0 2px}',
+    '.skl-nomor{text-align:center;font-size:11px;margin-bottom:10px}',
+    '.skl-field{display:flex;margin:2px 0 2px 18px}',
+    '.skl-flbl{min-width:200px}',
+    '.skl-fsep{min-width:14px}',
+    '.skl-fval{flex:1}',
+    '.skl-lulus{text-align:center;font-size:16px;font-weight:700;letter-spacing:4px;margin:7px 0}',
+    '.skl-tbl{width:100%;border-collapse:collapse;margin:7px 0;font-size:11px}',
+    '.skl-tbl th,.skl-tbl td{border:1px solid #000;padding:2px 6px}',
+    '.skl-tbl th{background:#0e7490;color:#ffffff;font-weight:700;text-align:center;-webkit-print-color-adjust:exact;print-color-adjust:exact}',
+    '.skl-tbl .subgrp{background:#e0f2f7;font-weight:700;color:#0e7490;-webkit-print-color-adjust:exact;print-color-adjust:exact}',
+    '.skl-tbl td:first-child{text-align:center;width:34px}',
+    '.skl-tbl td:last-child{text-align:center;width:88px}',
+    '.skl-sign{text-align:right;margin-top:14px;padding-right:18px}',
+    '.skl-sign p{margin:1px 0}',
+    '.skl-sign-name{font-weight:700;text-decoration:underline}',
+    'p{margin:5px 0}'
+  ].join('');
 }
 
 /* ═══════════════════════════════════════════════════ BATCH ═══ */
@@ -1205,6 +1637,45 @@ function generateSelected() {
   if (!indices.length) return showToast('Pilih minimal 1 siswa terlebih dahulu!', 'err');
   if (indices.length === 1) { downloadSKL(indices[0]); return; }
   batchDownload(indices);
+}
+
+function printSelected() {
+  var cbs     = document.querySelectorAll('.item-cb:checked');
+  var indices = [];
+  for (var i = 0; i < cbs.length; i++) {
+    indices.push(parseInt(cbs[i].getAttribute('data-idx')));
+  }
+  if (!indices.length) return showToast('Pilih minimal 1 siswa terlebih dahulu!', 'err');
+  batchPrint(indices);
+}
+
+/* Cetak beberapa SKL sekaligus dalam satu jendela print */
+function batchPrint(indices) {
+  var allHtml = '';
+  for (var i = 0; i < indices.length; i++) {
+    var stu = filteredStudents[indices[i]];
+    if (!stu) continue;
+    /* Setiap SKL dipisah dengan page-break kecuali yang terakhir */
+    var pb = (i < indices.length - 1) ? ' style="page-break-after:always"' : '';
+    allHtml += '<div' + pb + '>' + buildSKLHtml(stu) + '</div>';
+  }
+
+  var printWin = window.open('', '_blank', 'width=816,height=1252');
+  printWin.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8">');
+  printWin.document.write('<title>SKL — Cetak ' + indices.length + ' Siswa</title>');
+  printWin.document.write('<style>');
+  printWin.document.write(getSKLPrintCSS());
+  printWin.document.write('body{padding:1.5cm 2.5cm 1.5cm 3cm}');
+  printWin.document.write('@media print{body{margin:0;padding:0}@page{size:215.9mm 330.2mm;margin:1.5cm 2.5cm 1.5cm 3cm}}');
+  printWin.document.write('</style></head><body>');
+  printWin.document.write(allHtml);
+  printWin.document.write('</body></html>');
+  printWin.document.close();
+
+  printWin.onload = function() {
+    setTimeout(function() { printWin.focus(); printWin.print(); }, 700);
+  };
+  showToast('🖨️ Membuka dialog print untuk ' + indices.length + ' SKL...', 'ok');
 }
 
 function generateAll() {
@@ -1279,7 +1750,7 @@ function buildDocx(stu) {
 
   function tc(text, opts) {
     opts = opts || {};
-    return new D.TableCell({
+    var cellProps = {
       borders: bds,
       width:   { size: opts.w || 1000, type: D.WidthType.DXA },
       margins: cm,
@@ -1288,16 +1759,28 @@ function buildDocx(stu) {
         alignment: opts.a || D.AlignmentType.LEFT,
         spacing:   { before: 20, after: 20 },
         children:  [new D.TextRun({
-          text: String(text || ''),
-          size: 20, font: 'Times New Roman', bold: !!opts.b
+          text:  String(text || ''),
+          size:  20,
+          font:  'Times New Roman',
+          bold:  !!opts.b,
+          color: opts.white ? 'FFFFFF' : '000000'
         })]
       })]
-    });
+    };
+    /* Shading (background warna) */
+    if (opts.shade) {
+      cellProps.shading = {
+        type: D.ShadingType.SOLID,
+        color: opts.shade,
+        fill:  opts.shade
+      };
+    }
+    return new D.TableCell(cellProps);
   }
 
   function fl(label, value) {
     return new D.Paragraph({
-      spacing:  { before: 60, after: 60, line: 276 },
+      spacing:  { before: 40, after: 40, line: 260 },
       tabStops: [
         { type: D.TabStopType.LEFT, position: 3600 },
         { type: D.TabStopType.LEFT, position: 3780 }
@@ -1324,41 +1807,43 @@ function buildDocx(stu) {
     });
   }
 
-  /* Tabel nilai */
+  /* Tabel nilai — lebar total 9915 twips (F4 usable) */
   var trows = [];
+  /* Baris header — background teal gelap, teks putih */
   trows.push(new D.TableRow({ tableHeader: true, children: [
-    tc('No.',                 { w: 700,  a: D.AlignmentType.CENTER, b: 1 }),
-    tc('Mata Pelajaran',      { w: 5600, a: D.AlignmentType.CENTER, b: 1 }),
-    tc('Nilai Ujian Sekolah', { w: 1335, a: D.AlignmentType.CENTER, b: 1 })
+    tc('No.',                 { w: 700,  a: D.AlignmentType.CENTER, b: 1, shade: '0E7490', white: 1 }),
+    tc('Mata Pelajaran',      { w: 7000, a: D.AlignmentType.CENTER, b: 1, shade: '0E7490', white: 1 }),
+    tc('Nilai Ujian Sekolah', { w: 2215, a: D.AlignmentType.CENTER, b: 1, shade: '0E7490', white: 1 })
   ]}));
+  /* Sub-header Kelompok A — background teal muda */
   trows.push(new D.TableRow({ children: [
-    tc('A.', { w: 700, b: 1 }),
-    tc('Kelompok Mata Pelajaran Umum', { w: 5600, b: 1 }),
-    tc('',   { w: 1335 })
+    tc('A.', { w: 700,  b: 1, shade: 'E0F2F7' }),
+    tc('Kelompok Mata Pelajaran Umum', { w: 7000, b: 1, shade: 'E0F2F7' }),
+    tc('',   { w: 2215, shade: 'E0F2F7' })
   ]}));
   for (var a = 0; a < gA.length; a++) {
     trows.push(new D.TableRow({ children: [
       tc((a + 1) + '.', { w: 700,  a: D.AlignmentType.CENTER }),
-      tc(gA[a].name,    { w: 5600 }),
-      tc(gA[a].val,     { w: 1335, a: D.AlignmentType.CENTER })
+      tc(gA[a].name,    { w: 7000 }),
+      tc(gA[a].val,     { w: 2215, a: D.AlignmentType.CENTER })
     ]}));
   }
   trows.push(new D.TableRow({ children: [
-    tc('B.', { w: 700, b: 1 }),
-    tc('Kelompok Mata Pelajaran Kejuruan', { w: 5600, b: 1 }),
-    tc('',   { w: 1335 })
+    tc('B.', { w: 700,  b: 1, shade: 'E0F2F7' }),
+    tc('Kelompok Mata Pelajaran Kejuruan', { w: 7000, b: 1, shade: 'E0F2F7' }),
+    tc('',   { w: 2215, shade: 'E0F2F7' })
   ]}));
   for (var b = 0; b < gB.length; b++) {
     trows.push(new D.TableRow({ children: [
       tc((b + 1) + '.', { w: 700,  a: D.AlignmentType.CENTER }),
-      tc(gB[b].name,    { w: 5600 }),
-      tc(gB[b].val,     { w: 1335, a: D.AlignmentType.CENTER })
+      tc(gB[b].name,    { w: 7000 }),
+      tc(gB[b].val,     { w: 2215, a: D.AlignmentType.CENTER })
     ]}));
   }
   trows.push(new D.TableRow({ children: [
     tc(String(gB.length + 1) + '.', { w: 700,  a: D.AlignmentType.CENTER }),
-    tc('Nilai Rata-Rata',            { w: 5600, b: 1 }),
-    tc(avg,                          { w: 1335, a: D.AlignmentType.CENTER, b: 1 })
+    tc('Nilai Rata-Rata',            { w: 7000, b: 1 }),
+    tc(avg,                          { w: 2215, a: D.AlignmentType.CENTER, b: 1 })
   ]}));
 
   /* Kop surat */
@@ -1377,7 +1862,7 @@ function buildDocx(stu) {
 
   var logoCell = logoBytes
     ? new D.TableCell({
-        borders: noBds, width: { size: 1400, type: D.WidthType.DXA },
+        borders: noBds, width: { size: 1500, type: D.WidthType.DXA },
         verticalAlign: D.VerticalAlign.CENTER,
         margins: { top: 0, bottom: 0, left: 0, right: 80 },
         children: [new D.Paragraph({
@@ -1390,12 +1875,12 @@ function buildDocx(stu) {
         })]
       })
     : new D.TableCell({
-        borders: noBds, width: { size: 1400, type: D.WidthType.DXA },
+        borders: noBds, width: { size: 1500, type: D.WidthType.DXA },
         children: [new D.Paragraph({ children: [] })]
       });
 
   var textCell = new D.TableCell({
-    borders: noBds, width: { size: 7235, type: D.WidthType.DXA },
+    borders: noBds, width: { size: 8415, type: D.WidthType.DXA },
     verticalAlign: D.VerticalAlign.CENTER,
     children: kopTexts
   });
@@ -1404,8 +1889,8 @@ function buildDocx(stu) {
   var ch = [];
 
   ch.push(new D.Table({
-    width: { size: 8635, type: D.WidthType.DXA },
-    columnWidths: [1400, 7235],
+    width: { size: 9915, type: D.WidthType.DXA },
+    columnWidths: [1500, 8415],
     rows: [new D.TableRow({ children: [logoCell, textCell] })],
     borders: {
       top: noBdr, bottom: noBdr, left: noBdr, right: noBdr,
@@ -1414,17 +1899,17 @@ function buildDocx(stu) {
   }));
 
   ch.push(new D.Paragraph({
-    spacing: { before: 100, after: 0 },
+    spacing: { before: 60, after: 0 },
     border:  { bottom: { style: D.BorderStyle.SINGLE, size: 6, color: '000000', space: 1 } },
     children: []
   }));
 
-  ch.push(cp('SURAT KETERANGAN LULUS', { sz: 22, b: 1, u: 1, sb: 220, sa: 0 }));
-  ch.push(cp('Nomor: 421.5/     /2026', { sz: 20, sb: 60, sa: 180 }));
+  ch.push(cp('SURAT KETERANGAN LULUS', { sz: 22, b: 1, u: 1, sb: 160, sa: 0 }));
+  ch.push(cp('Nomor: 421.5/     /2026', { sz: 20, sb: 40, sa: 120 }));
 
   ch.push(new D.Paragraph({
     alignment: D.AlignmentType.JUSTIFIED,
-    spacing:   { before: 100, after: 100, line: 276 },
+    spacing:   { before: 60, after: 60, line: 260 },
     children:  [new D.TextRun({
       text: 'Yang bertandatangan di bawah ini Kepala Sekolah Menengah Kejuruan Negeri 1 Maluku Tengah Nomor Pokok Sekolah Nasional 60100166 Kabupaten Maluku Tengah Provinsi Maluku. Dengan ini menerangkan:',
       size: 20, font: 'Times New Roman'
@@ -1439,7 +1924,7 @@ function buildDocx(stu) {
 
   ch.push(new D.Paragraph({
     alignment: D.AlignmentType.JUSTIFIED,
-    spacing:   { before: 180, after: 60, line: 276 },
+    spacing:   { before: 120, after: 40, line: 260 },
     children:  [new D.TextRun({
       text: 'Berdasarkan kriteria kelulusan peserta didik yang sudah ditetapkan, maka yang bersangkutan dinyatakan:',
       size: 20, font: 'Times New Roman'
@@ -1448,25 +1933,25 @@ function buildDocx(stu) {
 
   ch.push(new D.Paragraph({
     alignment: D.AlignmentType.CENTER,
-    spacing:   { before: 100, after: 100 },
+    spacing:   { before: 60, after: 60 },
     children:  [new D.TextRun({ text: 'Lulus', size: 28, font: 'Times New Roman', bold: true })]
   }));
 
   ch.push(new D.Paragraph({
-    spacing:  { before: 60, after: 100 },
+    spacing:  { before: 40, after: 60 },
     children: [new D.TextRun({ text: 'Dengan hasil sebagai berikut:', size: 20, font: 'Times New Roman' })]
   }));
 
   ch.push(new D.Table({
-    width:        { size: 7635, type: D.WidthType.DXA },
-    columnWidths: [700, 5600, 1335],
+    width:        { size: 9915, type: D.WidthType.DXA },
+    columnWidths: [700, 7000, 2215],
     alignment:    D.AlignmentType.CENTER,
     rows:         trows
   }));
 
   ch.push(new D.Paragraph({
     alignment: D.AlignmentType.JUSTIFIED,
-    spacing:   { before: 180, after: 60 },
+    spacing:   { before: 120, after: 40 },
     children:  [new D.TextRun({
       text: 'Surat Keterangan ini bersifat sementara dan berlaku sampai diterbitkannya Ijazah untuk siswa yang bersangkutan.',
       size: 20, font: 'Times New Roman'
@@ -1475,7 +1960,7 @@ function buildDocx(stu) {
 
   ch.push(new D.Paragraph({
     alignment: D.AlignmentType.JUSTIFIED,
-    spacing:   { before: 60, after: 180 },
+    spacing:   { before: 40, after: 120 },
     children:  [new D.TextRun({
       text: 'Demikian Surat Keterangan ini diberikan agar dapat digunakan sebagaimana mestinya.',
       size: 20, font: 'Times New Roman'
@@ -1484,7 +1969,7 @@ function buildDocx(stu) {
 
   ch.push(new D.Paragraph({
     alignment: D.AlignmentType.RIGHT,
-    spacing:   { before: 100, after: 0 },
+    spacing:   { before: 60, after: 0 },
     indent:    { left: 5000 },
     children:  [new D.TextRun({ text: 'Maluku Tengah, ' + tgl, size: 20, font: 'Times New Roman' })]
   }));
@@ -1496,9 +1981,13 @@ function buildDocx(stu) {
     children:  [new D.TextRun({ text: 'Kepala Sekolah,', size: 20, font: 'Times New Roman' })]
   }));
 
-  for (var s2 = 0; s2 < 4; s2++) {
-    ch.push(new D.Paragraph({ spacing: { before: 0, after: 0 }, children: [] }));
-  }
+  /* Ruang tanda tangan: 1 paragraf dengan spacing after besar = ~4 baris */
+  ch.push(new D.Paragraph({
+    alignment: D.AlignmentType.RIGHT,
+    spacing:   { before: 0, after: 900 },
+    indent:    { left: 5000 },
+    children:  []
+  }));
 
   ch.push(new D.Paragraph({
     alignment: D.AlignmentType.RIGHT,
@@ -1522,8 +2011,8 @@ function buildDocx(stu) {
     sections: [{
       properties: {
         page: {
-          size:   { width: 11906, height: 16838 }, /* A4 */
-          margin: { top: 1134, right: 1134, bottom: 1134, left: 1418 }
+          size:   { width: 12184, height: 18648 }, /* F4 = 215.9mm × 330.2mm */
+          margin: { top: 851, right: 1418, bottom: 851, left: 1701 }
         }
       },
       children: ch
@@ -1537,6 +2026,19 @@ document.addEventListener('click', function(e) {
 });
 document.addEventListener('keydown', function(e) {
   if (e.key === 'Escape' && $id('modalOverlay').classList.contains('show')) closeModal();
+});
+
+/* Pause refresh saat tab tidak aktif, resume saat aktif lagi */
+document.addEventListener('visibilitychange', function() {
+  if (document.hidden) {
+    stopAutoRefresh();
+  } else {
+    /* Langsung refresh segera + restart interval */
+    if (allStudents.length > 0) {
+      silentRefresh();
+      startAutoRefresh();
+    }
+  }
 });
 
 /* ═══════════════════════════════════════════════════ INIT ═══ */
