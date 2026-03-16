@@ -785,7 +785,14 @@
       </div>
     </div>
   </div>
-  <footer>&copy; 2026 SMK Negeri 1 Maluku Tengah — SKL Generator</footer>
+  <footer>
+  <a href="https://alexbahy-tech.github.io/smartkurikulumsmkn1mt/" class="back-btn" 
+     style="display:inline-flex;margin-bottom:.8rem;">
+    ← Kembali ke Dashboard
+  </a>
+  <br>
+  &copy; 2026 SMK Negeri 1 Maluku Tengah — SKL Generator
+</footer>
 </div>
 
 <script src="https://unpkg.com/docx@9.5.1/build/index.umd.js"></script>
@@ -1554,7 +1561,7 @@ function buildSKLHtml(stu) {
   h += '<div class="skl-lulus">L U L U S</div>';
   h += '<p style="margin:4px 0;font-size:12px">Dengan hasil sebagai berikut:</p>';
 
-  h += '<table class="skl-tbl"><thead><tr><th>No.</th><th>Mata Pelajaran</th><th>Nilai Ujian Sekolah</th></tr></thead><tbody>';
+  h += '<table class="skl-tbl"><thead><tr><th>No.</th><th>Mata Pelajaran</th><th>Nilai</th></tr></thead><tbody>';
   h += '<tr class="subgrp"><td style="text-align:left" colspan="3"><b>A. Kelompok Mata Pelajaran Umum</b></td></tr>';
   for (var a = 0; a < gA.length; a++) {
     h += '<tr><td>' + (a + 1) + '</td>' +
